@@ -2,7 +2,7 @@
 
 %{
     (* put OCaml functions here *)
-    let variables = Hashtbl.create 32
+    let variables = Hashtbl.create 64
     
 %}
 
@@ -16,6 +16,7 @@
 %token FALSE
 %token ARROW
 %token LAMBDA
+%token SEMICOLON
 %token LBRACK
 %token RBRACK
 %token MINUS
@@ -27,23 +28,26 @@
 %left PLUS
 %left TIMES
 %left DIV
-%start <int> top
+(*%start <int> top*)
 %start <string> stringTop
 %start <bool> bool
 %%
 
+  (*
 top:
   | e = exp; EOF { e }
-  | uExp = unclosedExp; EOF { uExp }
-(*| l = lambda; EOF { l }*)
+  | uExp = unclosedExpr; EOF { uExp }*)
 
 stringTop:
   | e = exp; EOF { string_of_int e }
-  | uExp = unclosedExp; EOF { string_of_int uExp }
   | l = lambda; EOF { l }
   | s = string; EOF { s }
   | EQUALS; EOF { "equals" }
-  | a = assignment; EOF { a; "Variable assigned." }
+  | b = bool; EOF { "bool : " ^ (string_of_bool b) }
+  | a = assignment; EOF { "Variable assigned." }
+  | a = assignment; SEMICOLON; uExp = unclosedExpr; EOF { string_of_int uExp }
+  | a = assignment; SEMICOLON; s = stringTop { s }
+							
 
 string:
   | s = STRING { s }
@@ -51,17 +55,16 @@ string:
 (* returns string for now ??? *)
 lambda:
   | LAMBDA; v = VAR; ARROW; e = exp { string_of_int e }
-  | LAMBDA; v = VAR; ARROW; u = unclosedExp { string_of_int u }
+  (* TODO: implement closures *)
+  | LAMBDA; v = VAR; ARROW; u = unclosedExpr { string_of_int u }
   | LAMBDA; v = VAR; ARROW; s = string { s }
 
 bool:
   | b = TRUE { true }
   | b = FALSE { false }
 
-assignment:	      
-  | LET; v = VAR; { print_string "let var\n"; () }
-  | LET; v = VAR; EQUALS; { print_string "hello equals\n"; () }
-  | LET; v = VAR; EQUALS; i = INT { print_string "hello\n"; Hashtbl.add variables v i }
+assignment:
+  | LET; v = VAR; EQUALS; i = INT { Hashtbl.add variables v i }
 
 exp:
   | i = INT { i }
@@ -70,15 +73,23 @@ exp:
   | e = exp; TIMES; f = exp { e * f }
   | e = exp; DIV; f = exp { e / f }
 
-unclosedExp:
-  | e = exp; PLUS; v = VAR { 1 }
-  | e = exp; MINUS; v = VAR { 1 }
-  | e = exp; TIMES; v = VAR { 1 }
-  | e = exp; DIV; v = VAR { 1 }
-  | v = VAR; PLUS; f = exp { 1 }
-  | v = VAR; MINUS; f = exp { 1 }
-  | v = VAR; TIMES; f = exp { 1 }
-  | v = VAR; DIV; f = exp { 1 }
+unclosedExpr:
+  | v = VAR { Hashtbl.find variables v }
+			  
+  | e = exp; PLUS; v = VAR { e + (Hashtbl.find variables v) }
+  | e = exp; MINUS; v = VAR { e - (Hashtbl.find variables v) }
+  | e = exp; TIMES; v = VAR { e * (Hashtbl.find variables v) }
+  | e = exp; DIV; v = VAR { e / (Hashtbl.find variables v) }
+			  
+  | v = VAR; PLUS; e = exp { (Hashtbl.find variables v) + e }
+  | v = VAR; MINUS; e = exp { (Hashtbl.find variables v) - e }
+  | v = VAR; TIMES; e = exp { (Hashtbl.find variables v) * e }
+  | v = VAR; DIV; e = exp { (Hashtbl.find variables v) / e }
+			  
+  | v = VAR; PLUS; x = VAR{ (Hashtbl.find variables v) + (Hashtbl.find variables x) }
+  | v = VAR; MINUS; x = VAR { (Hashtbl.find variables v) - (Hashtbl.find variables x) }
+  | v = VAR; TIMES; x = VAR { (Hashtbl.find variables v) * (Hashtbl.find variables x) }
+  | v = VAR; DIV; x = VAR { (Hashtbl.find variables v) / (Hashtbl.find variables x) }
 
 		(*
 unclosedExp:
