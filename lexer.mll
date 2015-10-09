@@ -24,6 +24,8 @@ let varName = ['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
 let unboundVar = '_'
 let var = varName | unboundVar
 
+let letName = "let"
+		      
 (* let maths = (int | ['+' '-' '/' '*']) white* (int | white | ['+' '-' '/' '*'])* *)
 						      
 		(*
@@ -34,24 +36,21 @@ Future job: Agda-esque unicode with Uutf...
 OR rewrite lexer in Ulex rather than ocamllex
 open Uutf.String
 let lambda = ["lambda" 'λ'] white+ varName white* ["->" '→']
-		 *)	      
-
-
+		 *)
 		      
 rule read =
    parse
    | white { read lexbuf }
    | newline { incrementLine lexbuf; read lexbuf }
    | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
-   (*| lambda {
-	 (* eval the lambda somehow, for now continue *)
-	 Printf.printf "delicious lambda\n"; read lexbuf } *)
    | "lambda" { LAMBDA }
    | var { VAR (Lexing.lexeme lexbuf) }
    | "->" { ARROW }
    | "true" { TRUE }
    | "false" { FALSE }
    | '"' { readString (Buffer.create 16) lexbuf }
+   | '=' { EQUALS }
+   | letName { LET }
    | '+' { PLUS }
    | '*' { TIMES }
    | '-' { MINUS }
@@ -59,11 +58,11 @@ rule read =
    | '(' { LBRACK }
    | ')' { RBRACK }
    | _ { raise (SyntaxError ("Unexpected character: " ^ (Lexing.lexeme lexbuf) ^ "\n")) }
-   | eof { EOF }
+   | eof { print_string "EOF FOUND\n"; EOF }
 (* following function also taken from Real World OCaml *)
 and readString buf =
   parse
-  | '"'       { STRING (print_string (Buffer.contents buf); Buffer.contents buf) }
+  | '"'       { STRING (Buffer.contents buf) }
   | '\\' '/'  { Buffer.add_char buf '/'; readString buf lexbuf }
   | '\\' '\\' { Buffer.add_char buf '\\'; readString buf lexbuf }
   | '\\' 'b'  { Buffer.add_char buf '\b'; readString buf lexbuf }

@@ -1,0 +1,409 @@
+State 0:
+bool' -> . bool [ # ]
+-- On TRUE shift to state 1
+-- On FALSE shift to state 2
+-- On bool shift to state 3
+
+State 1:
+bool -> TRUE . [ # ]
+-- On # reduce production bool -> TRUE 
+
+State 2:
+bool -> FALSE . [ # ]
+-- On # reduce production bool -> FALSE 
+
+State 3:
+bool' -> bool . [ # ]
+-- On # accept bool
+
+State 4:
+stringTop' -> . stringTop [ # ]
+-- On VAR shift to state 5
+-- On STRING shift to state 23
+-- On LET shift to state 24
+-- On LAMBDA shift to state 28
+-- On INT shift to state 7
+-- On EQUALS shift to state 42
+-- On unclosedExp shift to state 44
+-- On stringTop shift to state 46
+-- On string shift to state 47
+-- On lambda shift to state 49
+-- On exp shift to state 51
+-- On assignment shift to state 53
+
+State 5:
+unclosedExp -> VAR . PLUS exp [ EOF ]
+unclosedExp -> VAR . MINUS exp [ EOF ]
+unclosedExp -> VAR . TIMES exp [ EOF ]
+unclosedExp -> VAR . DIV exp [ EOF ]
+-- On TIMES shift to state 6
+-- On PLUS shift to state 17
+-- On MINUS shift to state 19
+-- On DIV shift to state 21
+
+State 6:
+unclosedExp -> VAR TIMES . exp [ EOF ]
+-- On INT shift to state 7
+-- On exp shift to state 8
+
+State 7:
+exp -> INT . [ TIMES PLUS MINUS EOF DIV ]
+-- On TIMES reduce production exp -> INT 
+-- On PLUS reduce production exp -> INT 
+-- On MINUS reduce production exp -> INT 
+-- On EOF reduce production exp -> INT 
+-- On DIV reduce production exp -> INT 
+
+State 8:
+exp -> exp . PLUS exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . MINUS exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . TIMES exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . DIV exp [ TIMES PLUS MINUS EOF DIV ]
+unclosedExp -> VAR TIMES exp . [ EOF ]
+-- On TIMES shift to state 9
+-- On PLUS shift to state 13
+-- On MINUS shift to state 15
+-- On DIV shift to state 11
+-- On EOF reduce production unclosedExp -> VAR TIMES exp 
+
+State 9:
+exp -> exp TIMES . exp [ TIMES PLUS MINUS EOF DIV ]
+-- On INT shift to state 7
+-- On exp shift to state 10
+
+State 10:
+exp -> exp . PLUS exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . MINUS exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . TIMES exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp TIMES exp . [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . DIV exp [ TIMES PLUS MINUS EOF DIV ]
+-- On DIV shift to state 11
+-- On TIMES reduce production exp -> exp TIMES exp 
+-- On PLUS reduce production exp -> exp TIMES exp 
+-- On MINUS reduce production exp -> exp TIMES exp 
+-- On EOF reduce production exp -> exp TIMES exp 
+
+State 11:
+exp -> exp DIV . exp [ TIMES PLUS MINUS EOF DIV ]
+-- On INT shift to state 7
+-- On exp shift to state 12
+
+State 12:
+exp -> exp . PLUS exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . MINUS exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . TIMES exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . DIV exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp DIV exp . [ TIMES PLUS MINUS EOF DIV ]
+-- On TIMES reduce production exp -> exp DIV exp 
+-- On PLUS reduce production exp -> exp DIV exp 
+-- On MINUS reduce production exp -> exp DIV exp 
+-- On EOF reduce production exp -> exp DIV exp 
+-- On DIV reduce production exp -> exp DIV exp 
+
+State 13:
+exp -> exp PLUS . exp [ TIMES PLUS MINUS EOF DIV ]
+-- On INT shift to state 7
+-- On exp shift to state 14
+
+State 14:
+exp -> exp . PLUS exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp PLUS exp . [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . MINUS exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . TIMES exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . DIV exp [ TIMES PLUS MINUS EOF DIV ]
+-- On TIMES shift to state 9
+-- On DIV shift to state 11
+-- On PLUS reduce production exp -> exp PLUS exp 
+-- On MINUS reduce production exp -> exp PLUS exp 
+-- On EOF reduce production exp -> exp PLUS exp 
+
+State 15:
+exp -> exp MINUS . exp [ TIMES PLUS MINUS EOF DIV ]
+-- On INT shift to state 7
+-- On exp shift to state 16
+
+State 16:
+exp -> exp . PLUS exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . MINUS exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp MINUS exp . [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . TIMES exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . DIV exp [ TIMES PLUS MINUS EOF DIV ]
+-- On TIMES shift to state 9
+-- On PLUS shift to state 13
+-- On DIV shift to state 11
+-- On MINUS reduce production exp -> exp MINUS exp 
+-- On EOF reduce production exp -> exp MINUS exp 
+
+State 17:
+unclosedExp -> VAR PLUS . exp [ EOF ]
+-- On INT shift to state 7
+-- On exp shift to state 18
+
+State 18:
+exp -> exp . PLUS exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . MINUS exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . TIMES exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . DIV exp [ TIMES PLUS MINUS EOF DIV ]
+unclosedExp -> VAR PLUS exp . [ EOF ]
+-- On TIMES shift to state 9
+-- On PLUS shift to state 13
+-- On MINUS shift to state 15
+-- On DIV shift to state 11
+-- On EOF reduce production unclosedExp -> VAR PLUS exp 
+
+State 19:
+unclosedExp -> VAR MINUS . exp [ EOF ]
+-- On INT shift to state 7
+-- On exp shift to state 20
+
+State 20:
+exp -> exp . PLUS exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . MINUS exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . TIMES exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . DIV exp [ TIMES PLUS MINUS EOF DIV ]
+unclosedExp -> VAR MINUS exp . [ EOF ]
+-- On TIMES shift to state 9
+-- On PLUS shift to state 13
+-- On MINUS shift to state 15
+-- On DIV shift to state 11
+-- On EOF reduce production unclosedExp -> VAR MINUS exp 
+
+State 21:
+unclosedExp -> VAR DIV . exp [ EOF ]
+-- On INT shift to state 7
+-- On exp shift to state 22
+
+State 22:
+exp -> exp . PLUS exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . MINUS exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . TIMES exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . DIV exp [ TIMES PLUS MINUS EOF DIV ]
+unclosedExp -> VAR DIV exp . [ EOF ]
+-- On TIMES shift to state 9
+-- On PLUS shift to state 13
+-- On MINUS shift to state 15
+-- On DIV shift to state 11
+-- On EOF reduce production unclosedExp -> VAR DIV exp 
+
+State 23:
+string -> STRING . [ EOF ]
+-- On EOF reduce production string -> STRING 
+
+State 24:
+assignment -> LET . VAR [ EOF ]
+assignment -> LET . VAR EQUALS [ EOF ]
+assignment -> LET . VAR EQUALS INT [ EOF ]
+-- On VAR shift to state 25
+
+State 25:
+assignment -> LET VAR . [ EOF ]
+assignment -> LET VAR . EQUALS [ EOF ]
+assignment -> LET VAR . EQUALS INT [ EOF ]
+-- On EQUALS shift to state 26
+-- On EOF reduce production assignment -> LET VAR 
+
+State 26:
+assignment -> LET VAR EQUALS . [ EOF ]
+assignment -> LET VAR EQUALS . INT [ EOF ]
+-- On INT shift to state 27
+-- On EOF reduce production assignment -> LET VAR EQUALS 
+
+State 27:
+assignment -> LET VAR EQUALS INT . [ EOF ]
+-- On EOF reduce production assignment -> LET VAR EQUALS INT 
+
+State 28:
+lambda -> LAMBDA . VAR ARROW exp [ EOF ]
+lambda -> LAMBDA . VAR ARROW unclosedExp [ EOF ]
+lambda -> LAMBDA . VAR ARROW string [ EOF ]
+-- On VAR shift to state 29
+
+State 29:
+lambda -> LAMBDA VAR . ARROW exp [ EOF ]
+lambda -> LAMBDA VAR . ARROW unclosedExp [ EOF ]
+lambda -> LAMBDA VAR . ARROW string [ EOF ]
+-- On ARROW shift to state 30
+
+State 30:
+lambda -> LAMBDA VAR ARROW . exp [ EOF ]
+lambda -> LAMBDA VAR ARROW . unclosedExp [ EOF ]
+lambda -> LAMBDA VAR ARROW . string [ EOF ]
+-- On VAR shift to state 5
+-- On STRING shift to state 23
+-- On INT shift to state 7
+-- On unclosedExp shift to state 31
+-- On string shift to state 32
+-- On exp shift to state 33
+
+State 31:
+lambda -> LAMBDA VAR ARROW unclosedExp . [ EOF ]
+-- On EOF reduce production lambda -> LAMBDA VAR ARROW unclosedExp 
+
+State 32:
+lambda -> LAMBDA VAR ARROW string . [ EOF ]
+-- On EOF reduce production lambda -> LAMBDA VAR ARROW string 
+
+State 33:
+exp -> exp . PLUS exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . MINUS exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . TIMES exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . DIV exp [ TIMES PLUS MINUS EOF DIV ]
+lambda -> LAMBDA VAR ARROW exp . [ EOF ]
+unclosedExp -> exp . PLUS VAR [ EOF ]
+unclosedExp -> exp . MINUS VAR [ EOF ]
+unclosedExp -> exp . TIMES VAR [ EOF ]
+unclosedExp -> exp . DIV VAR [ EOF ]
+-- On TIMES shift to state 34
+-- On PLUS shift to state 36
+-- On MINUS shift to state 38
+-- On DIV shift to state 40
+-- On EOF reduce production lambda -> LAMBDA VAR ARROW exp 
+
+State 34:
+exp -> exp TIMES . exp [ TIMES PLUS MINUS EOF DIV ]
+unclosedExp -> exp TIMES . VAR [ EOF ]
+-- On VAR shift to state 35
+-- On INT shift to state 7
+-- On exp shift to state 10
+
+State 35:
+unclosedExp -> exp TIMES VAR . [ EOF ]
+-- On EOF reduce production unclosedExp -> exp TIMES VAR 
+
+State 36:
+exp -> exp PLUS . exp [ TIMES PLUS MINUS EOF DIV ]
+unclosedExp -> exp PLUS . VAR [ EOF ]
+-- On VAR shift to state 37
+-- On INT shift to state 7
+-- On exp shift to state 14
+
+State 37:
+unclosedExp -> exp PLUS VAR . [ EOF ]
+-- On EOF reduce production unclosedExp -> exp PLUS VAR 
+
+State 38:
+exp -> exp MINUS . exp [ TIMES PLUS MINUS EOF DIV ]
+unclosedExp -> exp MINUS . VAR [ EOF ]
+-- On VAR shift to state 39
+-- On INT shift to state 7
+-- On exp shift to state 16
+
+State 39:
+unclosedExp -> exp MINUS VAR . [ EOF ]
+-- On EOF reduce production unclosedExp -> exp MINUS VAR 
+
+State 40:
+exp -> exp DIV . exp [ TIMES PLUS MINUS EOF DIV ]
+unclosedExp -> exp DIV . VAR [ EOF ]
+-- On VAR shift to state 41
+-- On INT shift to state 7
+-- On exp shift to state 12
+
+State 41:
+unclosedExp -> exp DIV VAR . [ EOF ]
+-- On EOF reduce production unclosedExp -> exp DIV VAR 
+
+State 42:
+stringTop -> EQUALS . EOF [ # ]
+-- On EOF shift to state 43
+
+State 43:
+stringTop -> EQUALS EOF . [ # ]
+-- On # reduce production stringTop -> EQUALS EOF 
+
+State 44:
+stringTop -> unclosedExp . EOF [ # ]
+-- On EOF shift to state 45
+
+State 45:
+stringTop -> unclosedExp EOF . [ # ]
+-- On # reduce production stringTop -> unclosedExp EOF 
+
+State 46:
+stringTop' -> stringTop . [ # ]
+-- On # accept stringTop
+
+State 47:
+stringTop -> string . EOF [ # ]
+-- On EOF shift to state 48
+
+State 48:
+stringTop -> string EOF . [ # ]
+-- On # reduce production stringTop -> string EOF 
+
+State 49:
+stringTop -> lambda . EOF [ # ]
+-- On EOF shift to state 50
+
+State 50:
+stringTop -> lambda EOF . [ # ]
+-- On # reduce production stringTop -> lambda EOF 
+
+State 51:
+exp -> exp . PLUS exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . MINUS exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . TIMES exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . DIV exp [ TIMES PLUS MINUS EOF DIV ]
+stringTop -> exp . EOF [ # ]
+unclosedExp -> exp . PLUS VAR [ EOF ]
+unclosedExp -> exp . MINUS VAR [ EOF ]
+unclosedExp -> exp . TIMES VAR [ EOF ]
+unclosedExp -> exp . DIV VAR [ EOF ]
+-- On TIMES shift to state 34
+-- On PLUS shift to state 36
+-- On MINUS shift to state 38
+-- On EOF shift to state 52
+-- On DIV shift to state 40
+
+State 52:
+stringTop -> exp EOF . [ # ]
+-- On # reduce production stringTop -> exp EOF 
+
+State 53:
+stringTop -> assignment . EOF [ # ]
+-- On EOF shift to state 54
+
+State 54:
+stringTop -> assignment EOF . [ # ]
+-- On # reduce production stringTop -> assignment EOF 
+
+State 55:
+top' -> . top [ # ]
+-- On VAR shift to state 5
+-- On INT shift to state 7
+-- On unclosedExp shift to state 56
+-- On top shift to state 58
+-- On exp shift to state 59
+
+State 56:
+top -> unclosedExp . EOF [ # ]
+-- On EOF shift to state 57
+
+State 57:
+top -> unclosedExp EOF . [ # ]
+-- On # reduce production top -> unclosedExp EOF 
+
+State 58:
+top' -> top . [ # ]
+-- On # accept top
+
+State 59:
+exp -> exp . PLUS exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . MINUS exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . TIMES exp [ TIMES PLUS MINUS EOF DIV ]
+exp -> exp . DIV exp [ TIMES PLUS MINUS EOF DIV ]
+top -> exp . EOF [ # ]
+unclosedExp -> exp . PLUS VAR [ EOF ]
+unclosedExp -> exp . MINUS VAR [ EOF ]
+unclosedExp -> exp . TIMES VAR [ EOF ]
+unclosedExp -> exp . DIV VAR [ EOF ]
+-- On TIMES shift to state 34
+-- On PLUS shift to state 36
+-- On MINUS shift to state 38
+-- On EOF shift to state 60
+-- On DIV shift to state 40
+
+State 60:
+top -> exp EOF . [ # ]
+-- On # reduce production top -> exp EOF 
+

@@ -8,13 +8,8 @@ let prettyPrintPosition outx lexbuf =
   fprintf outx "Line number: %d, Position: %d"
     pos.pos_lnum (pos.pos_cnum - pos.pos_bol + 1)
 
-(*
-fprintf outx "File name: %s, Line number: %d, Position: %d" pos.pos_fname
-    pos.pos_lnum (pos.pos_cnum - pos.pos_bol + 1)*)
-
-
 let parseWithError lexbuf =
-  try Parser.top Lexer.read lexbuf with
+  try Parser.stringTop Lexer.read lexbuf with
   | Lexer.SyntaxError msg ->
      prerr_string msg;
      eprintf "\n%a: \n" prettyPrintPosition lexbuf;
@@ -27,7 +22,7 @@ let parseFile fileName =
   let channel = open_in fileName in
   Lexing.from_channel channel
   |> parseWithError
-  |> print_int;
+  |> print_string;
   print_newline ();
   close_in channel
 	   
@@ -37,7 +32,7 @@ let _ =
   else (read_line ()
        |> Lexing.from_string
        |> parseWithError
-       |> print_int;
+       |> print_string;
        print_newline ())
 
 

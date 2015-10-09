@@ -8,3 +8,4 @@ mainParser:
 
 clean:
 	$(OCB) -clean
+	rm -rf _/build/*
