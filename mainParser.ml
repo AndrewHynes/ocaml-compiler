@@ -15,7 +15,8 @@ let parseWithError lexbuf =
      eprintf "\n%a: \n" prettyPrintPosition lexbuf;
      exit (-1)
   | Parser.Error ->
-    eprintf "%a: syntax error\n" prettyPrintPosition lexbuf;
+     eprintf "%a: syntax error at " prettyPrintPosition lexbuf;
+     prerr_string ((Lexing.lexeme lexbuf) ^ "\n");
     exit (-1)
 
 let parseFile fileName =

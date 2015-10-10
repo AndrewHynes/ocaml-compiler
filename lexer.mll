@@ -44,9 +44,11 @@ rule read =
    | newline { incrementLine lexbuf; read lexbuf }
    | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
    | "lambda" { LAMBDA }
+   | "print" { PRINT }
    | "->" { ARROW }
    | "true" { TRUE }
    | "false" { FALSE }
+   | ';' { SEMICOLON }
    | '"' { readString (Buffer.create 16) lexbuf }
    | '=' { EQUALS }
    | '+' { PLUS }
@@ -55,7 +57,6 @@ rule read =
    | '/' { DIV }
    | '(' { LBRACK }
    | ')' { RBRACK }
-   | ';' { SEMICOLON }
    | letName { LET }
    | var { VAR (Lexing.lexeme lexbuf) }
    | _ { raise (SyntaxError ("Unexpected character: " ^ (Lexing.lexeme lexbuf) ^ "\n")) }
