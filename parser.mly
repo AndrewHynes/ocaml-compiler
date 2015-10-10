@@ -53,7 +53,7 @@
 string:
   | s = STRING { s }
 
-(* returns string for now ??? *)
+(* returns string for now, will change *)
 lambda:
   | LAMBDA; v = VAR; ARROW; e = exp { string_of_int e }
   (* TODO: implement closures *)

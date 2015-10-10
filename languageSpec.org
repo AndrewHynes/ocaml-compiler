@@ -1,0 +1,67 @@
+* Introduction
+
+This language's creation is for my third year Compiler Construction module for the MSci Computer Science course at the University of Birmingham.
+
+* Inspiration
+
+The language aims to be functional, 
+
+* Syntax
+
+** Whitespace
+
+Newlines and spaces (or the lack thereof) are ignored. "x=2" is equivalent to "x = 2". 
+
+** Arithmetic and mathematics
+
+The language uses very familiar syntax for arithmetic. Everything you expect to work should work: why make something easy harder than it should be?
+
+*** Addition
+
+Addition of x and 3 is performed via
+
+#+BEGIN_SRC language
+x + 3
+#+END_SRC
+
+*** Multiplication
+
+Multiplication of x and 3 is performed via
+
+#+BEGIN_SRC language
+x * 3
+#+END_SRC
+
+*** Subtraction
+
+The subtraction of x by 3 is performed via
+
+#+BEGIN_SRC language
+x - 3
+#+END_SRC
+
+*** Division
+
+The division of x by 3 is performed via
+
+#+BEGIN_SRC language
+x / 3
+#+END_SRC
+
+** Lambda expressions
+
+Lambda expressions are just like any other type of variable, as functions are first class. You can bind them to a variable or use them as anonymous functions for convenience. One might define a 'double' function as follows:
+
+#+BEGIN_SRC language
+lamda x -> x * 2
+#+END_SRC
+
+Or they might bind it as a variable using let...
+
+(NOTE: not yet implemented)
+
+#+BEGIN_SRC language
+let double = lamda x -> x * 2
+#+END_SRC
+
+
