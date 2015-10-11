@@ -2,6 +2,9 @@
 
 %{
     (* put OCaml functions here *)
+
+    (* TODO: Make polymorphic, somehow need a Hashtbl for each variable 
+       Store as bytes with type information? *)
     let variables = Hashtbl.create 64
 
     let findWithError tbl v = try Hashtbl.find tbl v
@@ -34,7 +37,6 @@
 %left PLUS
 %left TIMES
 %left DIV
-(*%start <int> top*)
 %start <string> stringTop
 %start <bool> bool
 %%
@@ -44,7 +46,7 @@
   | l = lambda; option(SEMICOLON); EOF { l }
   | s = string; option(SEMICOLON); EOF { "string : " ^ s }
   | b = bool; option(SEMICOLON); EOF { "bool : " ^ (string_of_bool b) }
-  | a = assignment; option(SEMICOLON); EOF { "Variable assigned." }
+  | a = assignment; option(SEMICOLON); EOF { "" }
   | p = print; option(SEMICOLON); EOF { "" }
   | uExp = unclosedExpr; option(SEMICOLON); EOF { "int : " ^ (string_of_int uExp) }
   | a = assignment; SEMICOLON; s = stringTop { s }
@@ -66,9 +68,8 @@ bool:
 
 print:
   | PRINT; s = STRING { print_string s }
-  | PRINT; i = INT { print_string (string_of_int i) }
-  | PRINT; v = VAR { print_string (string_of_int (findWithError variables v)) }
-  | PRINT; LBRACK; e = exp; RBRACK { print_string (string_of_int (e)) }
+  | PRINT; e = exp { print_string (string_of_int e) }
+  | PRINT; uExp = unclosedExpr { print_string (string_of_int uExp) }
 
 assignment:
   | LET; v = VAR; EQUALS; i = INT { Hashtbl.add variables v i }
@@ -77,13 +78,17 @@ assignment:
 
 exp:
   | i = INT { i }
+  | LBRACK; e = exp; RBRACK { e }
   | e = exp; PLUS; f = exp { e + f }
   | e = exp; MINUS; f = exp { e - f }
   | e = exp; TIMES; f = exp { e * f }
   | e = exp; DIV; f = exp { e / f }
 
+(* TODO: Make polymorphic *)
 unclosedExpr:
   | v = VAR { findWithError variables v }
+
+  | LBRACK; uExp = unclosedExpr; RBRACK { uExp } 
 			  
   | e = exp; PLUS; v = VAR { e + (findWithError variables v) }
   | e = exp; MINUS; v = VAR { e - (findWithError variables v) }
@@ -99,18 +104,5 @@ unclosedExpr:
   | v = VAR; MINUS; x = VAR { (findWithError variables v) - (findWithError variables x) }
   | v = VAR; TIMES; x = VAR { (findWithError variables v) * (findWithError variables x) }
   | v = VAR; DIV; x = VAR { (findWithError variables v) / (findWithError variables x) }
-
-		(*
-unclosedExp:
-  | e = exp; PLUS; v = VAR { e PLUS v }
-  | e = exp; MINUS; v = VAR { e MINUS v }
-  | e = exp; TIMES; v = VAR { e TIMES v }
-  | e = exp; DIV; v = VAR { e DIV v }
-  | v = VAR; PLUS; f = exp { v PLUS f }
-  | v = VAR; MINUS; f = exp { v MINUS f }
-  | v = VAR; TIMES; f = exp { v TIMES f }
-  | v = VAR; DIV; f = exp { v DIV f }
-		 *)
-
 
 			  

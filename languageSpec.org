@@ -4,13 +4,23 @@ This language's creation is for my third year Compiler Construction module for t
 
 * Inspiration
 
-The language aims to be functional, 
+The language aims to be functional, easy to use, and heavily inspired by ML. Its type system is Hindley-Milner based, and the programmer should not have to specify types explicitly, they should be inferred.
 
 * Syntax
 
 ** Whitespace
 
-Newlines and spaces (or the lack thereof) are ignored. "x=2" is equivalent to "x = 2". 
+Newlines and spaces (or the lack thereof) are ignored. The following programs are equivalent:
+
+#+BEGIN_SRC language
+let x = 3; 
+let y = 8;
+print x + y;
+#+END_SRC
+
+#+BEGIN_SRC language
+let x=3;let y=8;print x+y;
+#+END_SRC
 
 ** Arithmetic and mathematics
 
