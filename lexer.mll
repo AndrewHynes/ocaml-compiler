@@ -18,6 +18,8 @@ let incrementLine lexbuf =
 let int = '-'? ['0'-'9'] ['0'-'9']*
 let white = [' ' '\t']+
 let newline = '\n' | '\r' | "\r\n"
+
+let float = int '.' ['0'-'9'] ['0'-'9']*		    
 					    
 (* variable names must begin with a letter *)
 let varName = ['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
@@ -25,17 +27,9 @@ let unboundVar = '_'
 let var = varName | unboundVar
 
 let letName = "let"
-		      
-(* let maths = (int | ['+' '-' '/' '*']) white* (int | white | ['+' '-' '/' '*'])* *)
-						      
 		(*
-let expr = maths | lambda
-let bracketedExpr = '(' expr ')'   
-
 Future job: Agda-esque unicode with Uutf...
 OR rewrite lexer in Ulex rather than ocamllex
-open Uutf.String
-let lambda = ["lambda" 'λ'] white+ varName white* ["->" '→']
 		 *)
 		      
 rule read =
@@ -43,11 +37,14 @@ rule read =
    | white { read lexbuf }
    | newline { incrementLine lexbuf; read lexbuf }
    | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
+   | float { FLOAT (float_of_string (Lexing.lexeme lexbuf)) }
    | "lambda" { LAMBDA }
    | "print" { PRINT }
    | "->" { ARROW }
-   | "true" { TRUE }
-   | "false" { FALSE }
+   | "true" { BOOL true }
+   | "false" { BOOL false }
+   | "&&" { AND }
+   | "||" { OR }
    | ';' { SEMICOLON }
    | '"' { readString (Buffer.create 16) lexbuf }
    | '=' { EQUALS }

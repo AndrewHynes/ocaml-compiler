@@ -18,11 +18,12 @@
 %token <float> FLOAT
 %token <string> STRING
 %token <string> VAR
+%token <bool> BOOL
 %token LET
 %token EQUALS
 %token PRINT
-%token TRUE
-%token FALSE
+%token AND
+%token OR
 %token ARROW
 %token LAMBDA
 %token SEMICOLON
@@ -33,22 +34,24 @@
 %token TIMES
 %token DIV
 %token EOF
+%left AND
+%left OR
 %left MINUS
 %left PLUS
 %left TIMES
 %left DIV
 %start <string> stringTop
-%start <bool> bool
 %%
 
   stringTop:
   | e = exp; option(SEMICOLON); EOF { "int : " ^ (string_of_int e) }
   | l = lambda; option(SEMICOLON); EOF { l }
   | s = string; option(SEMICOLON); EOF { "string : " ^ s }
-  | b = bool; option(SEMICOLON); EOF { "bool : " ^ (string_of_bool b) }
+  | b = boolExp; option(SEMICOLON); EOF { "bool : " ^ (string_of_bool b) }
   | a = assignment; option(SEMICOLON); EOF { "" }
   | p = print; option(SEMICOLON); EOF { "" }
   | uExp = unclosedExpr; option(SEMICOLON); EOF { "int : " ^ (string_of_int uExp) }
+  | fExp = floatExp; option(SEMICOLON); EOF { "float : " ^ (string_of_float fExp) }
   | a = assignment; SEMICOLON; s = stringTop { s }
   | p = print; SEMICOLON; s = stringTop { s }
 							
@@ -62,14 +65,20 @@ lambda:
   | LAMBDA; v = VAR; ARROW; u = unclosedExpr { string_of_int u }
   | LAMBDA; v = VAR; ARROW; s = string { s }
 
-bool:
-  | b = TRUE { true }
-  | b = FALSE { false }
+boolExp:
+  | b = BOOL { b }
+  | LBRACK; b = boolExp; RBRACK { b }
+  | b = boolExp; OR; c = boolExp { b || c }
+  | b = boolExp; AND; c = boolExp { b && c }
+
+floatExp:
+  | f = FLOAT { f }
 
 print:
   | PRINT; s = STRING { print_string s }
   | PRINT; e = exp { print_string (string_of_int e) }
   | PRINT; uExp = unclosedExpr { print_string (string_of_int uExp) }
+  | PRINT; b = boolExp { print_string (string_of_bool b) }
 
 assignment:
   | LET; v = VAR; EQUALS; i = INT { Hashtbl.add variables v i }
