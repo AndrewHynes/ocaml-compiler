@@ -1,0 +1,41 @@
+print "Evaluating !(!true && false)\n";
+print "Should say true: ";
+print !(!true && false);
+print "\n";
+
+print "\n";
+
+print "Evaluating (true && false)\n";
+print "Should say false: ";
+print (true && false);
+print "\n";
+
+print "\n";
+
+print "Evaluating !true\n";
+print "Should say false: ";
+print !true;
+print "\n";
+
+print "\n";
+
+print "Evaluating !false\n";
+print "Should say true: ";
+print !false;
+print "\n";
+
+print "\n";
+
+print "Evaluating (true || false)\n";
+print "Should say true: ";
+print (true || false);
+print "\n";
+
+print "\n";
+
+
+print "Evaluating !(true || false)\n";
+print "Should say false: ";
+print !(true || false);
+
+

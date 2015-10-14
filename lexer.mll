@@ -46,6 +46,7 @@ rule read =
    | "&&" { AND }
    | "||" { OR }
    | ';' { SEMICOLON }
+   | '!' { EXCLAIMATION }
    | '"' { readString (Buffer.create 16) lexbuf }
    | '=' { EQUALS }
    | '+' { PLUS }

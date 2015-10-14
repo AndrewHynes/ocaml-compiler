@@ -8,6 +8,26 @@ The language aims to be functional, easy to use, and heavily inspired by ML. Its
 
 * Syntax
 
+** Grammar
+
+The grammar of this language is – for now – one based off two kinds of statements. The first are statements that return a result, such as 3 + x, and the second are statements that produce some kind of side effect or do not return a result, such as print "hello!", let x = 3, or the definition of a function.
+
+You can have as many of the second kind of statement as you want, but zero or one statements that returns a result which must be at the end of the program. Each statement of the second type must end with a semi colon, but statements of the first type do not need to. Whitespace is ignored. 
+
+Example programs that compile:
+
+#+BEGIN_SRC language
+3 + 3
+#+END_SRC
+
+#+BEGIN_SRC language
+print "hello world";
+#+END_SRC
+
+#+BEGIN_SRC language
+let x = 3; x + 7
+#+END_SRC
+
 ** Whitespace
 
 Newlines and spaces (or the lack thereof) are ignored. The following programs are equivalent:

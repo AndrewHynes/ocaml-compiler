@@ -25,6 +25,7 @@
 %token AND
 %token OR
 %token ARROW
+%token EXCLAIMATION
 %token LAMBDA
 %token SEMICOLON
 %token LBRACK
@@ -40,6 +41,7 @@
 %left PLUS
 %left TIMES
 %left DIV
+%left EXCLAIMATION
 %start <string> stringTop
 %%
 
@@ -54,6 +56,7 @@
   | fExp = floatExp; option(SEMICOLON); EOF { "float : " ^ (string_of_float fExp) }
   | a = assignment; SEMICOLON; s = stringTop { s }
   | p = print; SEMICOLON; s = stringTop { s }
+  | SEMICOLON; EOF { "" }
 							
 string:
   | s = STRING { s }
@@ -65,20 +68,26 @@ lambda:
   | LAMBDA; v = VAR; ARROW; u = unclosedExpr { string_of_int u }
   | LAMBDA; v = VAR; ARROW; s = string { s }
 
-boolExp:
+boolExp:				
   | b = BOOL { b }
+  | EXCLAIMATION; b = boolExp { not b }
   | LBRACK; b = boolExp; RBRACK { b }
   | b = boolExp; OR; c = boolExp { b || c }
   | b = boolExp; AND; c = boolExp { b && c }
 
 floatExp:
   | f = FLOAT { f }
+  | x = floatExp; PLUS; y = floatExp { x +. y}
+  | x = floatExp; MINUS; y = floatExp { x -. y }
+  | x = floatExp; TIMES; y = floatExp { x *. y }
+  | x = floatExp; DIV; y = floatExp { x /. y }
 
 print:
   | PRINT; s = STRING { print_string s }
   | PRINT; e = exp { print_string (string_of_int e) }
   | PRINT; uExp = unclosedExpr { print_string (string_of_int uExp) }
   | PRINT; b = boolExp { print_string (string_of_bool b) }
+  | PRINT; f = floatExp { print_string (string_of_float f) }
 
 assignment:
   | LET; v = VAR; EQUALS; i = INT { Hashtbl.add variables v i }
