@@ -7,10 +7,30 @@
        Store as bytes with type information? *)
     let variables = Hashtbl.create 64
 
+
     let findWithError tbl v = try Hashtbl.find tbl v
 			      with (* TODO: do not just exit 1 *)
 			        | Not_found -> print_string ("Error: Variable reference \'" ^ v ^ "\' not found. Did you spell it wrong?\n"); exit (-1)
 			        | _ -> Hashtbl.find tbl v
+
+						    (*
+    let localvariables = Hashtbl.create 64
+
+    let checkLocals v = try Hashtbl.find localvariables v
+			with
+			| Not_found -> findWithError
+			| _ -> Hashtbl.find localvariables v*)
+
+    type ocamlType = Bool of bool
+		   | Int of int
+		   | Float of float
+		   | String of string
+
+    let stringOfType = function
+      | Bool b    -> string_of_bool b
+      | Int i     -> string_of_int i
+      | Float f   -> string_of_float f
+      | String s  -> s
 
 %}
 
@@ -20,6 +40,7 @@
 %token <string> VAR
 %token <bool> BOOL
 %token LET
+%token FUNC
 %token EQUALS
 %token PRINT
 %token AND
@@ -45,29 +66,39 @@
 %start <string> stringTop
 %%
 
-  stringTop:
+stringTop:
   | e = exp; option(SEMICOLON); EOF { "int : " ^ (string_of_int e) }
-  | l = lambda; option(SEMICOLON); EOF { l }
   | s = string; option(SEMICOLON); EOF { "string : " ^ s }
   | b = boolExp; option(SEMICOLON); EOF { "bool : " ^ (string_of_bool b) }
-  | a = assignment; option(SEMICOLON); EOF { "" }
-  | p = print; option(SEMICOLON); EOF { "" }
+					
+  | l = lambda; option(SEMICOLON); EOF { stringOfType l }
+  | FUNC; name = VAR; l = list(v = VAR { v }); EQUALS { "function!" }
+					   
   | uExp = unclosedExpr; option(SEMICOLON); EOF { "int : " ^ (string_of_int uExp) }
   | fExp = floatExp; option(SEMICOLON); EOF { "float : " ^ (string_of_float fExp) }
-  | a = assignment; SEMICOLON; s = stringTop { s }
+					    
+  | p = print; option(SEMICOLON); EOF { "" }
   | p = print; SEMICOLON; s = stringTop { s }
+  | a = assignment; option(SEMICOLON); EOF { "" }
+  | a = assignment; SEMICOLON; s = stringTop { s }
+					
   | SEMICOLON; EOF { "" }
 							
 string:
   | s = STRING { s }
 
-(* returns string for now, will change *)
 lambda:
-  | LAMBDA; v = VAR; ARROW; e = exp { string_of_int e }
+  | LAMBDA; v = VAR; ARROW; e = exp { Int e }
   (* TODO: implement closures *)
-  | LAMBDA; v = VAR; ARROW; u = unclosedExpr { string_of_int u }
-  | LAMBDA; v = VAR; ARROW; s = string { s }
-
+  (* Must also Hashtbl.remove variable after Hashtbl.add *)
+				    (*TODO: fix
+  | LBRACK; LAMBDA; v = VAR; ARROW; u = unclosedExpr; RBRACK; u2 = unclosedExpr { Hashtbl.add variables v u2; Int u }
+  | LBRACK; LAMBDA; v = VAR; ARROW; u = unclosedExpr; RBRACK; e = exp { Hashtbl.add variables v e; Int u }*)
+  | LAMBDA; v = VAR; ARROW; u = unclosedExpr { Int u }
+  | LAMBDA; v = VAR; ARROW; f = floatExp { Float f }
+  | LAMBDA; v = VAR; ARROW; s = string { String s }
+  | LAMBDA; v = VAR; ARROW; b = boolExp { Bool b }
+					
 boolExp:				
   | b = BOOL { b }
   | EXCLAIMATION; b = boolExp { not b }
@@ -89,9 +120,11 @@ print:
   | PRINT; b = boolExp { print_string (string_of_bool b) }
   | PRINT; f = floatExp { print_string (string_of_float f) }
 
+(* TODO: Make polymorphic *)
 assignment:
-  | LET; v = VAR; EQUALS; i = INT { Hashtbl.add variables v i }
-  | LET; v = VAR; EQUALS; x = VAR { Hashtbl.add variables v (findWithError variables x) }
+  | LET; v = VAR; EQUALS; i = INT { Hashtbl.replace variables v i }
+  | LET; v = VAR; EQUALS; x = VAR { Hashtbl.replace variables v (findWithError variables x) }
+				 
   (*| LET; v = VAR; EQUALS; s = STRING { ? } *)
 
 exp:

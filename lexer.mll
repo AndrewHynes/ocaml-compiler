@@ -43,6 +43,7 @@ rule read =
    | "->" { ARROW }
    | "true" { BOOL true }
    | "false" { BOOL false }
+   | "func" { FUNC }
    | "&&" { AND }
    | "||" { OR }
    | ';' { SEMICOLON }

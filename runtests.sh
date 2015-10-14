@@ -1,3 +1,5 @@
+#!/bin/sh
+
 for file in "testCases"/*
 do
     echo "----- TEST STARTING -----"
