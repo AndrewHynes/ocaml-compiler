@@ -1,0 +1,2 @@
+print "This program should print 6\n";
+(λ x → 3 + 3) true

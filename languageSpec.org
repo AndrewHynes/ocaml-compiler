@@ -86,6 +86,12 @@ Lambda expressions are just like any other type of variable, as functions are fi
 lamda x -> x * 2
 #+END_SRC
 
+It may be worth pointing out that "λ" can replace "lambda", and "→" can replace "->". To make the previous expression a lot prettier, we could write it as: 
+
+#+BEGIN_SRC language
+λ x → x * 2
+#+END_SRC
+
 Or they might bind it as a variable using let...
 
 (NOTE: not yet implemented)
@@ -93,5 +99,11 @@ Or they might bind it as a variable using let...
 #+BEGIN_SRC language
 let double = lamda x -> x * 2
 #+END_SRC
+
+** Functions
+
+A function can be defined 
+
+(Note: not yet implemented)
 
 

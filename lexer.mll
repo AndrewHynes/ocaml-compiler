@@ -19,7 +19,11 @@ let int = '-'? ['0'-'9'] ['0'-'9']*
 let white = [' ' '\t']+
 let newline = '\n' | '\r' | "\r\n"
 
-let float = int '.' ['0'-'9'] ['0'-'9']*		    
+let float = int '.' ['0'-'9'] ['0'-'9']*
+
+(* basic unicode handling *)
+let lambda = "lambda" | "\206\187"
+let arrow = "->" | "\226\134\146"
 					    
 (* variable names must begin with a letter *)
 let varName = ['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
@@ -38,9 +42,9 @@ rule read =
    | newline { incrementLine lexbuf; read lexbuf }
    | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
    | float { FLOAT (float_of_string (Lexing.lexeme lexbuf)) }
-   | "lambda" { LAMBDA }
+   | lambda { LAMBDA }
+   | arrow { ARROW }
    | "print" { PRINT }
-   | "->" { ARROW }
    | "true" { BOOL true }
    | "false" { BOOL false }
    | "func" { FUNC }

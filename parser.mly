@@ -72,7 +72,7 @@ stringTop:
   | b = boolExp; option(SEMICOLON); EOF { "bool : " ^ (string_of_bool b) }
 					
   | l = lambda; option(SEMICOLON); EOF { stringOfType l }
-  | FUNC; name = VAR; l = list(v = VAR { v }); EQUALS { "function!" }
+  | FUNC; name = VAR; l = list(v = VAR { v }); EQUALS { "Start of a function called " ^ name }
 					   
   | uExp = unclosedExpr; option(SEMICOLON); EOF { "int : " ^ (string_of_int uExp) }
   | fExp = floatExp; option(SEMICOLON); EOF { "float : " ^ (string_of_float fExp) }
@@ -81,19 +81,33 @@ stringTop:
   | p = print; SEMICOLON; s = stringTop { s }
   | a = assignment; option(SEMICOLON); EOF { "" }
   | a = assignment; SEMICOLON; s = stringTop { s }
-					
+					     
+  | SEMICOLON; s = stringTop { s } 
   | SEMICOLON; EOF { "" }
+
+value:
+  | b = boolExp { Bool b }
+  | f = floatExp { Float f }
+  | s = string { String s }
+  | e = exp { Int e }
 							
 string:
   | s = STRING { s }
 
 lambda:
-  | LAMBDA; v = VAR; ARROW; e = exp { Int e }
+
+
+				    
+  | LBRACK; LAMBDA; v = VAR; ARROW; e = exp; RBRACK; value { Int e }
   (* TODO: implement closures *)
   (* Must also Hashtbl.remove variable after Hashtbl.add *)
 				    (*TODO: fix
   | LBRACK; LAMBDA; v = VAR; ARROW; u = unclosedExpr; RBRACK; u2 = unclosedExpr { Hashtbl.add variables v u2; Int u }
   | LBRACK; LAMBDA; v = VAR; ARROW; u = unclosedExpr; RBRACK; e = exp { Hashtbl.add variables v e; Int u }*)
+							   
+  (* should return a function, not an int: TYPE ERROR! 
+   Same deal for the rest of the expressions below. *)
+  | LAMBDA; v = VAR; ARROW; e = exp { Int e }
   | LAMBDA; v = VAR; ARROW; u = unclosedExpr { Int u }
   | LAMBDA; v = VAR; ARROW; f = floatExp { Float f }
   | LAMBDA; v = VAR; ARROW; s = string { String s }
