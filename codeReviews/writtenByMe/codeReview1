@@ -1,0 +1,18 @@
+--- For Alexandru Ionita ---
+
+Reviewer's comments:
+Good:
+* The code is well structured 
+
+* There aren't any over-complicated functions
+
+* Directory structure is off to a good start
+
+To Improve:
+* There isn't anything (or very much) here that hasn't been studied in lecture or is in Real OCaml, adding something new would be great.
+
+* There have not yet been any tests written. Tests are important and a suite of regression tests will go a long way to catch bugs in the future
+
+* Make a src directory for your source code, and consider writing your language's grammar in something other than plain text. I'd also expand the language's grammar more than is written in your grammar file, even with ideas not currently implemented. Having a general goal to work towards what to parse/compile will help a lot.
+
+

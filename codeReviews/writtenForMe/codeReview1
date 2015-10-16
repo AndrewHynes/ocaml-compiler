@@ -1,0 +1,32 @@
+--- Written by Alexandru Ionita --- 
+
+Review for Andrew Hynes
+
+Good: 
+* Great explanation of the grammar and the compiler is very easy to use
+
+* A lot of clear  testCases written. 
+
+* Good handling of errors
+
+To improve: 
+* The interpreted accepts just 1 expression at a time. 
+
+* The mainParser.ml should be modified so that the interpreted can accept as many expressions as possible
+
+* Adding the feature of accepting round brackets in arithmetic expressions
+
+* in the future the compiler should recognize the built in OCaml functions ( like if .... the ... else ; for() ; while () )
+
+Response:
+
+* The interpreter accepting one expression at a time is in part a design decision. Though of course the process should not exit after evaluating an expression, interpreters such as GHCI and OCaml's do not try and parse two expressions at once! That would be relatively nonsensical. The process should not exit after pressing enter, though, and I will try and make it accept more.
+
+* As mentioned in the previous response, I will attempt to make this a feature of the interpreter in the future, but that is low priority as I am currently undertaking a big code change.
+
+* This feature already exists! Brackets are parsed and handled relatively flawlessly.
+
+* I might not use OCaml's syntax exactly. In the future, I may want to get control flow working but that's very low priority for now (lambdas and functions are more important), and I don't think I will use OCaml's syntax exactly: though the compiler is written in OCaml, that is not what the language is intended to be! The language's grammar probably will not include for loops or while loops, though if statements are something I certainly need to work on.
+
+
+
