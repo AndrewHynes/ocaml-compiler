@@ -31,7 +31,6 @@
       | Int i     -> string_of_int i
       | Float f   -> string_of_float f
       | String s  -> s
-
 %}
 
 %token <int> INT
@@ -95,9 +94,6 @@ string:
   | s = STRING { s }
 
 lambda:
-
-
-				    
   | LBRACK; LAMBDA; v = VAR; ARROW; e = exp; RBRACK; value { Int e }
   (* TODO: implement closures *)
   (* Must also Hashtbl.remove variable after Hashtbl.add *)

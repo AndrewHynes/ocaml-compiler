@@ -80,5 +80,3 @@ and readString buf =
       Buffer.add_string buf (Lexing.lexeme lexbuf);
       readString buf lexbuf
     }
-
-
