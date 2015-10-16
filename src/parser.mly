@@ -20,17 +20,22 @@
 			with
 			| Not_found -> findWithError
 			| _ -> Hashtbl.find localvariables v*)
+		       
+    type langType = Bool of bool
+		  | Int of int
+		  | Float of float
+		  | String of string
 
-    type ocamlType = Bool of bool
-		   | Int of int
-		   | Float of float
-		   | String of string
-
+    type impureOp = Print of string
+		  | Assign of langType
+				
     let stringOfType = function
       | Bool b    -> string_of_bool b
       | Int i     -> string_of_int i
       | Float f   -> string_of_float f
       | String s  -> s
+
+    type program = impureOp list * langType
 %}
 
 %token <int> INT

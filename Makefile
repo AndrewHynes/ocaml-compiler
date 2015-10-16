@@ -1,10 +1,10 @@
-FLAGS = -use-menhir -use-ocamlfind
+FLAGS = -use-menhir -use-ocamlfind -I
 OCB = ocamlbuild $(FLAGS)
 
 all: mainParser
 
 mainParser:
-	$(OCB) mainParser.native
+	$(OCB) src mainParser.native
 
 clean:
 	$(OCB) -clean
