@@ -7,5 +7,5 @@ mainParser:
 	$(OCB) src mainParser.native
 
 clean:
-	$(OCB) -clean
-	rm -rf _/build/*
+	$(OCB) src -clean
+	rm -rf _/build/src/*

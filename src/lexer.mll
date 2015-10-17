@@ -2,8 +2,6 @@
 open Parser
 open Lexing
 exception SyntaxError of string
-
-(* can fill this area with code*)
 			   
 (* I took this function from Real World OCaml, no reason to reinvent the wheel *)
 let incrementLine lexbuf =
@@ -31,10 +29,6 @@ let unboundVar = '_'
 let var = varName | unboundVar
 
 let letName = "let"
-		(*
-Future job: Agda-esque unicode with Uutf...
-OR rewrite lexer in Ulex rather than ocamllex
-		 *)
 		      
 rule read =
    parse

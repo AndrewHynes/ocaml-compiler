@@ -1,41 +1,7 @@
 (* Parser for the compiler *)
 
 %{
-    (* put OCaml functions here *)
-
-    (* TODO: Make polymorphic, somehow need a Hashtbl for each variable 
-       Store as bytes with type information? *)
-    let variables = Hashtbl.create 64
-
-
-    let findWithError tbl v = try Hashtbl.find tbl v
-			      with (* TODO: do not just exit 1 *)
-			        | Not_found -> print_string ("Error: Variable reference \'" ^ v ^ "\' not found. Did you spell it wrong?\n"); exit (-1)
-			        | _ -> Hashtbl.find tbl v
-
-						    (*
-    let localvariables = Hashtbl.create 64
-
-    let checkLocals v = try Hashtbl.find localvariables v
-			with
-			| Not_found -> findWithError
-			| _ -> Hashtbl.find localvariables v*)
-		       
-    type langType = Bool of bool
-		  | Int of int
-		  | Float of float
-		  | String of string
-
-    type impureOp = Print of string
-		  | Assign of langType
-				
-    let stringOfType = function
-      | Bool b    -> string_of_bool b
-      | Int i     -> string_of_int i
-      | Float f   -> string_of_float f
-      | String s  -> s
-
-    type program = impureOp list * langType
+    open Syntax
 %}
 
 %token <int> INT
@@ -67,108 +33,94 @@
 %left TIMES
 %left DIV
 %left EXCLAIMATION
-%start <string> stringTop
+%start <Syntax.program> parseTreeTop
 %%
 
-stringTop:
-  | e = exp; option(SEMICOLON); EOF { "int : " ^ (string_of_int e) }
-  | s = string; option(SEMICOLON); EOF { "string : " ^ s }
-  | b = boolExp; option(SEMICOLON); EOF { "bool : " ^ (string_of_bool b) }
-					
-  | l = lambda; option(SEMICOLON); EOF { stringOfType l }
-  | FUNC; name = VAR; l = list(v = VAR { v }); EQUALS { "Start of a function called " ^ name }
-					   
-  | uExp = unclosedExpr; option(SEMICOLON); EOF { "int : " ^ (string_of_int uExp) }
-  | fExp = floatExp; option(SEMICOLON); EOF { "float : " ^ (string_of_float fExp) }
-					    
-  | p = print; option(SEMICOLON); EOF { "" }
-  | p = print; SEMICOLON; s = stringTop { s }
-  | a = assignment; option(SEMICOLON); EOF { "" }
-  | a = assignment; SEMICOLON; s = stringTop { s }
-					     
-  | SEMICOLON; s = stringTop { s } 
-  | SEMICOLON; EOF { "" }
+parseTreeTop:
+  | s = string; option(SEMICOLON); EOF { (LT (String s)) :: [] }
+  | b = boolExpT; option(SEMICOLON); EOF { (BoolType b) :: [] }
+					 
+  | LBRACK; l = lambda; RBRACK; p = parseTreeTop  { (Lambda l)::p }
+  | l = lambda; option(SEMICOLON); EOF { (Lambda l):: [] }
+  | f = func; option(SEMICOLON); EOF { (Function f):: [] }
 
-value:
-  | b = boolExp { Bool b }
-  | f = floatExp { Float f }
-  | s = string { String s }
-  | e = exp { Int e }
-							
+  | uExp = unclosedExpT; option(SEMICOLON); EOF { MathsExp uExp :: [] }
+					    
+  | p = printT; option(SEMICOLON); EOF { p :: [] }
+  | a = assignmentT; option(SEMICOLON); EOF { a :: [] }
+  | p = printT; SEMICOLON; t = parseTreeTop { p :: t }
+  | a = assignmentT; SEMICOLON; t = parseTreeTop { a :: t }
+					     
+  | SEMICOLON; t = parseTreeTop { t } 
+  | SEMICOLON; EOF { [] }
+						
 string:
   | s = STRING { s }
 
 lambda:
-  | LBRACK; LAMBDA; v = VAR; ARROW; e = exp; RBRACK; value { Int e }
-  (* TODO: implement closures *)
-  (* Must also Hashtbl.remove variable after Hashtbl.add *)
-				    (*TODO: fix
-  | LBRACK; LAMBDA; v = VAR; ARROW; u = unclosedExpr; RBRACK; u2 = unclosedExpr { Hashtbl.add variables v u2; Int u }
-  | LBRACK; LAMBDA; v = VAR; ARROW; u = unclosedExpr; RBRACK; e = exp { Hashtbl.add variables v e; Int u }*)
-							   
-  (* should return a function, not an int: TYPE ERROR! 
-   Same deal for the rest of the expressions below. *)
-  | LAMBDA; v = VAR; ARROW; e = exp { Int e }
-  | LAMBDA; v = VAR; ARROW; u = unclosedExpr { Int u }
-  | LAMBDA; v = VAR; ARROW; f = floatExp { Float f }
-  | LAMBDA; v = VAR; ARROW; s = string { String s }
-  | LAMBDA; v = VAR; ARROW; b = boolExp { Bool b }
-					
-boolExp:				
-  | b = BOOL { b }
-  | EXCLAIMATION; b = boolExp { not b }
-  | LBRACK; b = boolExp; RBRACK { b }
-  | b = boolExp; OR; c = boolExp { b || c }
-  | b = boolExp; AND; c = boolExp { b && c }
+  | LAMBDA; l = list(v = VAR { v }); ARROW; u = unclosedExpT { (l, MathsExp u) }
 
-floatExp:
-  | f = FLOAT { f }
-  | x = floatExp; PLUS; y = floatExp { x +. y}
-  | x = floatExp; MINUS; y = floatExp { x -. y }
-  | x = floatExp; TIMES; y = floatExp { x *. y }
-  | x = floatExp; DIV; y = floatExp { x /. y }
+(* TODO: finish. List is only placeholder, obviously *)
+func:
+  | FUNC; name = VAR; l = list(v = VAR { v }); EQUALS; u = unclosedExpT { (name, ("", String "change me")::[], MathsExp u) }
 
-print:
-  | PRINT; s = STRING { print_string s }
-  | PRINT; e = exp { print_string (string_of_int e) }
-  | PRINT; uExp = unclosedExpr { print_string (string_of_int uExp) }
-  | PRINT; b = boolExp { print_string (string_of_bool b) }
-  | PRINT; f = floatExp { print_string (string_of_float f) }
+printT:
+  | PRINT; s = STRING { PrintVal (String s) }
+  | PRINT; uExp = unclosedExpT { PrintExp (MathsExp uExp) }
+  | PRINT; b = boolExpT { PrintExp (BoolType b) }
 
-(* TODO: Make polymorphic *)
-assignment:
-  | LET; v = VAR; EQUALS; i = INT { Hashtbl.replace variables v i }
-  | LET; v = VAR; EQUALS; x = VAR { Hashtbl.replace variables v (findWithError variables x) }
-				 
-  (*| LET; v = VAR; EQUALS; s = STRING { ? } *)
+assignmentT:
+  (*Following are covered in unclosedExpT:
+   | LET; v = VAR; EQUALS; i = INT { Assignment (v, Int i) }
+  | LET; v = VAR; EQUALS; x = VAR { AssignVar (v, x) }*)
+  | LET; v = VAR; EQUALS; l = lambda { AssignExp (v, Lambda l) }
+  | LET; v = VAR; EQUALS; b = boolExpT { AssignExp (v, BoolType b) }
+  | LET; v = VAR; EQUALS; u = unclosedExpT { AssignExp (v, MathsExp u) }
+				  
+(*
+expT:
+  | i = INT { Value (Int i) }
+  | LBRACK; e = expT; RBRACK { e }
+  | e = expT; PLUS; f = expT { Int (Plus e f) }
+  | e = expT; MINUS; f = expT { Int (Minus e f) }
+  | e = expT; TIMES; f = expT { Int (Times e f) }
+  | e = expT; DIV; f = expT { Int (Div e f) }*)
+			    
+boolExpT:				
+  | b = BOOL { Bool b }
+  | LBRACK; b = boolExpT; RBRACK { b }
+  | EXCLAIMATION; b = boolExpT { Not b }
+  | b = boolExpT; OR; c = boolExpT { Or (b, c) }
+  | b = boolExpT; AND; c = boolExpT { And (b, c) }
 
-exp:
-  | i = INT { i }
-  | LBRACK; e = exp; RBRACK { e }
-  | e = exp; PLUS; f = exp { e + f }
-  | e = exp; MINUS; f = exp { e - f }
-  | e = exp; TIMES; f = exp { e * f }
-  | e = exp; DIV; f = exp { e / f }
+(*
+floatExpT:
+  | f = FLOAT { Value (Float f) }
+  | x = floatExpT; PLUS; y = floatExpT { Plus (x, y) }
+  | x = floatExpT; MINUS; y = floatExpT { Minus (x, y) }
+  | x = floatExpT; TIMES; y = floatExpT { Times (x, y) }
+  | x = floatExpT; DIV; y = floatExpT { Div (x, y) }*)
 
-(* TODO: Make polymorphic *)
-unclosedExpr:
-  | v = VAR { findWithError variables v }
-
-  | LBRACK; uExp = unclosedExpr; RBRACK { uExp } 
-			  
-  | e = exp; PLUS; v = VAR { e + (findWithError variables v) }
-  | e = exp; MINUS; v = VAR { e - (findWithError variables v) }
-  | e = exp; TIMES; v = VAR { e * (findWithError variables v) }
-  | e = exp; DIV; v = VAR { e / (findWithError variables v) }
-			  
-  | v = VAR; PLUS; e = exp { (findWithError variables v) + e }
-  | v = VAR; MINUS; e = exp { (findWithError variables v) - e }
-  | v = VAR; TIMES; e = exp { (findWithError variables v) * e }
-  | v = VAR; DIV; e = exp { (findWithError variables v) / e }
-			  
-  | v = VAR; PLUS; x = VAR{ (findWithError variables v) + (findWithError variables x) }
-  | v = VAR; MINUS; x = VAR { (findWithError variables v) - (findWithError variables x) }
-  | v = VAR; TIMES; x = VAR { (findWithError variables v) * (findWithError variables x) }
-  | v = VAR; DIV; x = VAR { (findWithError variables v) / (findWithError variables x) }
-
-			  
+(* TODO: fold constants if the whole tree contains no Var
+TODO: better handling of VAR *)
+unclosedExpT:			
+  | v = VAR { Value (Var v) }
+  | i = INT { Value (Int i) }
+  | f = FLOAT { Value (Float f) }
+	    
+  | LBRACK; uExp = unclosedExpT; RBRACK { uExp }
+	    
+  | u = unclosedExpT; PLUS; v = unclosedExpT { Plus (u, v) }
+  | u = unclosedExpT; MINUS; v = unclosedExpT { Minus (u, v)}
+  | u = unclosedExpT; TIMES; v = unclosedExpT { Times (u, v)}
+  | u = unclosedExpT; DIV; v = unclosedExpT { Div (u, v) }
+				   
+			  (*
+  | v = VAR; PLUS; u = unclosedExpT { Plus (Value (Var v), u) }
+  | v = VAR; MINUS; u = unclosedExpT { Minus (Value (Var v), u) }
+  | v = VAR; TIMES; u = unclosedExpT { Times (Value (Var v), u) }
+  | v = VAR; DIV; u = unclosedExpT { Div (Value (Var v), u) }
+  | v = VAR; PLUS; x = VAR { Plus (Value (Var v), Value (Var x)) }
+  | v = VAR; MINUS; x = VAR { Minus (Value (Var v), Value (Var x)) }
+  | v = VAR; TIMES; x = VAR { Times (Value (Var v), Value (Var x)) }
+  | v = VAR; DIV; x = VAR { Div (Value (Var v), Value (Var x)) }*)
