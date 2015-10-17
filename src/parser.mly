@@ -37,90 +37,51 @@
 %%
 
 parseTreeTop:
-  | s = string; option(SEMICOLON); EOF { (LT (String s)) :: [] }
-  | b = boolExpT; option(SEMICOLON); EOF { (BoolType b) :: [] }
-					 
-  | LBRACK; l = lambda; RBRACK; p = parseTreeTop  { (Lambda l)::p }
-  | l = lambda; option(SEMICOLON); EOF { (Lambda l):: [] }
-  | f = func; option(SEMICOLON); EOF { (Function f):: [] }
+  | l = list(statement); EOF { l }
 
-  | uExp = unclosedExpT; option(SEMICOLON); EOF { MathsExp uExp :: [] }
-					    
-  | p = printT; option(SEMICOLON); EOF { p :: [] }
-  | a = assignmentT; option(SEMICOLON); EOF { a :: [] }
-  | p = printT; SEMICOLON; t = parseTreeTop { p :: t }
-  | a = assignmentT; SEMICOLON; t = parseTreeTop { a :: t }
-					     
-  | SEMICOLON; t = parseTreeTop { t } 
-  | SEMICOLON; EOF { [] }
-						
-string:
-  | s = STRING { s }
+statement:
+  | e = expression { e }
+  | p = printT; list(SEMICOLON) { p }
+  | a = assignmentT; list(SEMICOLON) { a }
+  | f = func { Function f }
+  | l = lambda  { Lambda l }
+(*| f = funCall { f } *)
+
+expression:
+  | v = VAR { Value (Var v) }
+  | s = STRING { Value (String s) }
+  | i = INT { Value (Int i) }
+  | f = FLOAT { Value (Float f) }
+  | b = BOOL { Value (Bool b) }
+
+  | LBRACK; e = expression; RBRACK { e }
+	     
+  | e = expression; PLUS;  e2 = expression { Plus  (e, e2) }
+  | e = expression; TIMES; e2 = expression { Times (e, e2) }
+  | e = expression; MINUS; e2 = expression { Minus (e, e2) }
+  | e = expression; DIV;   e2 = expression { Div   (e, e2) }
+
+  | EXCLAIMATION; e = expression { Not e }
+  | e = expression; AND; e2 = expression { And (e, e2) }
+  | e = expression; OR;  e2 = expression { Or  (e, e2) }
+
+(*
+funCall:
+  | v = VAR; l = list(expression) { FunCall (v, l) }*)
 
 lambda:
-  | LAMBDA; l = list(v = VAR { v }); ARROW; u = unclosedExpT { (l, MathsExp u) }
+  | LBRACK; l = lambda; RBRACK { l }
+  | LAMBDA; l = list(v = VAR { v }); ARROW; e = expression { (l, e) }
 
-(* TODO: finish. List is only placeholder, obviously *)
+(* TODO: finish. The list is only placeholder, obviously *)
 func:
-  | FUNC; name = VAR; l = list(v = VAR { v }); EQUALS; u = unclosedExpT { (name, ("", String "change me")::[], MathsExp u) }
+  | FUNC; name = VAR; l = list(v = VAR { v }); EQUALS; e = expression { (name, ("", String "change me")::[], e) }
 
 printT:
-  | PRINT; s = STRING { PrintVal (String s) }
-  | PRINT; uExp = unclosedExpT { PrintExp (MathsExp uExp) }
-  | PRINT; b = boolExpT { PrintExp (BoolType b) }
-
+  | LBRACK; p = printT; RBRACK { p }
+  | PRINT; e = expression { PrintExp e }
+	
 assignmentT:
-  (*Following are covered in unclosedExpT:
-   | LET; v = VAR; EQUALS; i = INT { Assignment (v, Int i) }
-  | LET; v = VAR; EQUALS; x = VAR { AssignVar (v, x) }*)
-  | LET; v = VAR; EQUALS; l = lambda { AssignExp (v, Lambda l) }
-  | LET; v = VAR; EQUALS; b = boolExpT { AssignExp (v, BoolType b) }
-  | LET; v = VAR; EQUALS; u = unclosedExpT { AssignExp (v, MathsExp u) }
-				  
-(*
-expT:
-  | i = INT { Value (Int i) }
-  | LBRACK; e = expT; RBRACK { e }
-  | e = expT; PLUS; f = expT { Int (Plus e f) }
-  | e = expT; MINUS; f = expT { Int (Minus e f) }
-  | e = expT; TIMES; f = expT { Int (Times e f) }
-  | e = expT; DIV; f = expT { Int (Div e f) }*)
-			    
-boolExpT:				
-  | b = BOOL { Bool b }
-  | LBRACK; b = boolExpT; RBRACK { b }
-  | EXCLAIMATION; b = boolExpT { Not b }
-  | b = boolExpT; OR; c = boolExpT { Or (b, c) }
-  | b = boolExpT; AND; c = boolExpT { And (b, c) }
-
-(*
-floatExpT:
-  | f = FLOAT { Value (Float f) }
-  | x = floatExpT; PLUS; y = floatExpT { Plus (x, y) }
-  | x = floatExpT; MINUS; y = floatExpT { Minus (x, y) }
-  | x = floatExpT; TIMES; y = floatExpT { Times (x, y) }
-  | x = floatExpT; DIV; y = floatExpT { Div (x, y) }*)
-
-(* TODO: fold constants if the whole tree contains no Var
-TODO: better handling of VAR *)
-unclosedExpT:			
-  | v = VAR { Value (Var v) }
-  | i = INT { Value (Int i) }
-  | f = FLOAT { Value (Float f) }
-	    
-  | LBRACK; uExp = unclosedExpT; RBRACK { uExp }
-	    
-  | u = unclosedExpT; PLUS; v = unclosedExpT { Plus (u, v) }
-  | u = unclosedExpT; MINUS; v = unclosedExpT { Minus (u, v)}
-  | u = unclosedExpT; TIMES; v = unclosedExpT { Times (u, v)}
-  | u = unclosedExpT; DIV; v = unclosedExpT { Div (u, v) }
-				   
-			  (*
-  | v = VAR; PLUS; u = unclosedExpT { Plus (Value (Var v), u) }
-  | v = VAR; MINUS; u = unclosedExpT { Minus (Value (Var v), u) }
-  | v = VAR; TIMES; u = unclosedExpT { Times (Value (Var v), u) }
-  | v = VAR; DIV; u = unclosedExpT { Div (Value (Var v), u) }
-  | v = VAR; PLUS; x = VAR { Plus (Value (Var v), Value (Var x)) }
-  | v = VAR; MINUS; x = VAR { Minus (Value (Var v), Value (Var x)) }
-  | v = VAR; TIMES; x = VAR { Times (Value (Var v), Value (Var x)) }
-  | v = VAR; DIV; x = VAR { Div (Value (Var v), Value (Var x)) }*)
+  | LBRACK; a = assignmentT; RBRACK { a }
+  | LET; v = VAR; EQUALS; e = expression { AssignExp (v, e) }
+					 			    

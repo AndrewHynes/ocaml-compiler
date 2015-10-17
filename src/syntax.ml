@@ -9,23 +9,24 @@ type maths = Plus of maths * maths
 	   | Div of maths * maths
 	   | Minus of maths * maths
 	   | Value of langType
-			
-type boolType = Bool of bool
-	      | Not of boolType
-	      | Or of boolType * boolType
-	      | And of boolType * boolType
 
-type expression = MathsExp of maths
-		| BoolType of boolType
-		| LT of langType
+type expression = Plus of expression * expression
+		| Times of expression * expression
+		| Div of expression * expression
+		| Minus of expression * expression
+		| Value of langType
+
+		| Not of expression
+		| Or  of expression * expression
+		| And of expression * expression	     
+			     
 		| Application of expression * expression
-		| Assignment of string * langType
 		| AssignExp of string * expression
 		| AssignVar of string * string
-		| PrintVal of langType
 		| PrintExp of expression
 		| Lambda of lambdaExp
 		| Function of funct
+		| FunCall of string * (expression list)
  and lambdaExp = string list * expression
  and funct = string * ((string * langType) list) * expression
 
