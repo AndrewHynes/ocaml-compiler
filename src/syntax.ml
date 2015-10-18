@@ -20,12 +20,15 @@ type expression = Plus of expression * expression
 		| Or  of expression * expression
 		| And of expression * expression	     
 			     
-		| Application of expression * expression
 		| AssignExp of string * expression
 		| AssignVar of string * string
+		(* name of new variable * arguments * body *)
+		| AssignFunc of string * (string list) * expression
+					   
 		| PrintExp of expression
 		| Lambda of lambdaExp
 		| Function of funct
+		| Application of expression * expression
 		| FunCall of string * (expression list)
  and lambdaExp = string list * expression
  and funct = string * (string list) * expression

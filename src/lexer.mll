@@ -20,6 +20,9 @@ let newline = '\n' | '\r' | "\r\n"
 let float = int '.' ['0'-'9'] ['0'-'9']*
 
 (* basic unicode handling *)
+(* Unicode key:
+λ = \206\187
+→ = \226\134\146 *)
 let lambda = "lambda" | "\206\187"
 let arrow = "->" | "\226\134\146"
 					    

@@ -8,5 +8,5 @@ To compile, simply type make. The executable will be called mainParser.native. T
 
 DEPENDENCIES: Menhir version >=20150921, OCaml >=4.02
 
-To run the tests, simply run the file runtests.sh (e.g. by typing ./runtests.sh or sh runtests.sh). This shell script assumes you have already compiled with make beforehand.
+To run the tests, first type "make test" to compile them. Afterwards, run the executable test.native (such as by typing ./test.native).
 

@@ -41,9 +41,9 @@ parseTreeTop:
 
 statement:
   | e = expression { e }
-  | p = printT; list(SEMICOLON) { p }
-  | a = assignmentT; list(SEMICOLON) { a }
-  | f = func; list(SEMICOLON) { Function f }
+  | p = printT; SEMICOLON+ { p }
+  | a = assignmentT; SEMICOLON+ { a }
+  | f = func; SEMICOLON+ { Function f }
   | l = lambda  { Lambda l }
 (*| f = funCall { f } *)
 
@@ -71,12 +71,12 @@ funCall:
 
 lambda:
   | LBRACK; l = lambda; RBRACK { l }
-  | LAMBDA; l = list(v = VAR { v }); ARROW; e = expression { (l, e) }
+  | LAMBDA; l = nonempty_list(v = VAR { v }); ARROW; e = expression { (l, e) }
 
 (* Name, list of args, then expression 
    May need refinement (type information?) *)
 func:
-  | FUNC; name = VAR; l = list(v = VAR { v }); EQUALS; e = expression { (name, l, e) }
+  | FUNC; name = VAR; l = nonempty_list(v = VAR { v }); EQUALS; e = expression { (name, l, e) }
 
 printT:
   | LBRACK; p = printT; RBRACK { p }
@@ -85,4 +85,7 @@ printT:
 assignmentT:
   | LBRACK; a = assignmentT; RBRACK { a }
   | LET; v = VAR; EQUALS; e = expression { AssignExp (v, e) }
+  | LET; v = VAR; EQUALS; l = lambda { match l with
+				       | (vs, e) -> AssignFunc (v, vs, e) }
+					 
 					 			    

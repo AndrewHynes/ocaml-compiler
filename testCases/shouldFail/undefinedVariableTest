@@ -1,5 +1,0 @@
-print "This program should have an undefined variable on line three\n";
-let x = 3;
-let y = x + z;
-print y;
-

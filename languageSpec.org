@@ -94,16 +94,16 @@ It may be worth pointing out that "λ" can replace "lambda", and "→" can repla
 
 Or they might bind it as a variable using let...
 
-(NOTE: not yet implemented)
-
 #+BEGIN_SRC language
-let double = lamda x -> x * 2
+let double = lamda x -> x * 2;
 #+END_SRC
 
 ** Functions
 
-A function can be defined 
+A function can be defined using the keyword func...
 
-(Note: not yet implemented)
+#+BEGIN_SRC language
+func double x = x * 2;
+#+END_SRC
 
 
