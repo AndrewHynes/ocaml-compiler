@@ -28,6 +28,6 @@ type expression = Plus of expression * expression
 		| Function of funct
 		| FunCall of string * (expression list)
  and lambdaExp = string list * expression
- and funct = string * ((string * langType) list) * expression
+ and funct = string * (string list) * expression
 
 type program = expression list

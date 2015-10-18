@@ -43,7 +43,7 @@ statement:
   | e = expression { e }
   | p = printT; list(SEMICOLON) { p }
   | a = assignmentT; list(SEMICOLON) { a }
-  | f = func { Function f }
+  | f = func; list(SEMICOLON) { Function f }
   | l = lambda  { Lambda l }
 (*| f = funCall { f } *)
 
@@ -73,9 +73,10 @@ lambda:
   | LBRACK; l = lambda; RBRACK { l }
   | LAMBDA; l = list(v = VAR { v }); ARROW; e = expression { (l, e) }
 
-(* TODO: finish. The list is only placeholder, obviously *)
+(* Name, list of args, then expression 
+   May need refinement (type information?) *)
 func:
-  | FUNC; name = VAR; l = list(v = VAR { v }); EQUALS; e = expression { (name, ("", String "change me")::[], e) }
+  | FUNC; name = VAR; l = list(v = VAR { v }); EQUALS; e = expression { (name, l, e) }
 
 printT:
   | LBRACK; p = printT; RBRACK { p }

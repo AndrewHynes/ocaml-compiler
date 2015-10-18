@@ -24,7 +24,7 @@ let rec stringFromExpression = function
   | PrintExp e -> "(Print: " ^ (stringFromExpression e) ^ ")"
 								      
   | Lambda (l, e) -> "(Lambda (VARIABLES: " ^ (printVars l) ^ "), " ^ (stringFromExpression e) ^ ")"
-  | Function (s, _, e) -> "(Function (name: " ^ s ^ ")" ^ ", " ^ "(function body: " ^ (stringFromExpression e) ^ "))"
+  | Function (s, l, e) -> "(Function (name: " ^ s ^ ")" ^ ", (args: " ^ (printVars l) ^ ") (function body: " ^ (stringFromExpression e) ^ "))"
   | FunCall _ -> "(FUNCTION CALL)"
 				
   | Plus (n, m) -> "(Plus " ^ (stringFromExpression n) ^ ", " ^  (stringFromExpression m) ^ ")"
@@ -35,7 +35,6 @@ let rec stringFromExpression = function
   | Not b -> "(Not " ^ (stringFromExpression b) ^ ")"
   | Or (b, c) -> "(Or " ^ (stringFromExpression b) ^ ", " ^ (stringFromExpression c) ^ ")"
   | And (b, c) -> "(And " ^ (stringFromExpression b) ^ ", " ^ (stringFromExpression c) ^ ")"
-										  
 										    
 let rec stringFromAST = function
   | [] -> ""
@@ -48,7 +47,7 @@ let prettyPrintPosition outx lexbuf =
     pos.pos_lnum (pos.pos_cnum - pos.pos_bol + 1)
 
 let parseWithError lexbuf =
-  try stringFromAST (Parser.parseTreeTop Lexer.read lexbuf) with
+  try stringFromAST (List.map Optimiser.foldConstants (Parser.parseTreeTop Lexer.read lexbuf)) with
   | Lexer.SyntaxError msg ->
      prerr_string msg;
      eprintf "\n%a: \n" prettyPrintPosition lexbuf;
@@ -76,49 +75,3 @@ let _ =
        print_newline ())
 
 
-
-
-(*
-
-let stringFromLangType (l : langType) = match l with
-  | Int i -> string_of_int i
-  | Bool b -> string_of_bool b
-  | Float f -> string_of_float f
-  | String s -> s
-  | Var s -> s
-
-let rec stringFromBoolType (b : boolType) = match b with
-  | Bool b -> string_of_bool b
-  | Not b -> "(Not " ^ (stringFromBoolType b) ^ ")"
-  | Or (b, c) -> "(Or " ^ (stringFromBoolType b) ^ ", " ^ (stringFromBoolType c) ^ ")"
-  | And (b, c) -> "(And " ^ (stringFromBoolType b) ^ ", " ^ (stringFromBoolType c) ^ ")"
-
-let rec stringFromMaths = function
-  | Value l -> stringFromLangType l
-  | Plus (n, m) -> "(Plus " ^ (stringFromMaths n) ^ ", " ^  (stringFromMaths m) ^ ")"
-  | Times (n, m) -> "(Times " ^ (stringFromMaths n) ^ ", " ^  (stringFromMaths m) ^ ")"
-  | Minus (n, m) -> "(Minus " ^ (stringFromMaths n) ^ ", " ^  (stringFromMaths m) ^ ")"
-  | Div (n, m) -> "(Div " ^ (stringFromMaths n) ^ ", " ^  (stringFromMaths m) ^ ")"
-
-let rec printVars = function
-  | [] -> ""
-  | hd::[] -> ("identifier : " ^ hd)
-  | x::y::tl -> ("identifier : " ^ x ^ ", " ) ^ (printVars (y :: tl))
-										  
-let rec stringFromExpression = function
-  | MathsExp m -> stringFromMaths m
-  | BoolType b -> stringFromBoolType b
-  | LT l -> stringFromLangType l
-  | Application (e, e2) -> "(Application " ^ (stringFromExpression e) ^ ", " ^ (stringFromExpression e2) ^ ")"
-  | Assignment (s, l) -> "(Assignment: " ^ s ^ " = " ^ (stringFromLangType l) ^ ")"
-  | AssignVar (s, t) -> "(Assignment: " ^ s ^ " = variable " ^ t ^ ")"
-  | AssignExp (s, e) -> "(Assignment: " ^ s ^ " = " ^ (stringFromExpression e) ^ ")"
-  | PrintVal l -> "(Print " ^ (stringFromLangType l) ^ ")"
-  | PrintExp e -> "(Print expression " ^ (stringFromExpression e) ^ ")"
-  | Lambda (l, e) -> "(Lambda (VARIABLES: " ^ (printVars l) ^ "), " ^ (stringFromExpression e) ^ ")"
-  | Function (s, _, e) -> "(Function (name: " ^ s ^ ")" ^ ", " ^ "(function body: " ^ (stringFromExpression e) ^ "))"
-										    
-let rec stringFromAST = function
-  | [] -> ""
-  | hd::tl -> (stringFromExpression hd) ^ (stringFromAST tl)
- *)
