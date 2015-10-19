@@ -21,10 +21,11 @@ let float = int '.' ['0'-'9'] ['0'-'9']*
 
 (* basic unicode handling *)
 (* Unicode key:
-λ = \206\187
+λ = \206\187×
 → = \226\134\146 *)
 let lambda = "lambda" | "\206\187"
 let arrow = "->" | "\226\134\146"
+let times = '*' | "\195\151"
 					    
 (* variable names must begin with a letter *)
 let varName = ['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
@@ -45,6 +46,10 @@ rule read =
    | "true" { BOOL true }
    | "false" { BOOL false }
    | "func" { FUNC }
+   | "if" { IF }
+   | "then" { THEN }
+   | "else" { ELSE }
+   | "mod" { MOD }
    | "&&" { AND }
    | "||" { OR }
    | ';' { SEMICOLON }
@@ -52,11 +57,17 @@ rule read =
    | '"' { readString (Buffer.create 16) lexbuf }
    | '=' { EQUALS }
    | '+' { PLUS }
-   | '*' { TIMES }
+   | times { TIMES }
    | '-' { MINUS }
    | '/' { DIV }
+   | "==" { EQLOGIC }
+   | '>'  { GT }
+   | '<'  { LT }
+   | "<=" { LTEQ }
+   | ">=" { GTEQ }
    | '(' { LBRACK }
    | ')' { RBRACK }
+   | '#' { ignoreLine lexbuf }
    | letName { LET }
    | var { VAR (Lexing.lexeme lexbuf) }
    | _ { raise (SyntaxError ("Unexpected character: " ^ (Lexing.lexeme lexbuf) ^ "\n")) }
@@ -77,3 +88,8 @@ and readString buf =
       Buffer.add_string buf (Lexing.lexeme lexbuf);
       readString buf lexbuf
     }
+and ignoreLine =
+  parse
+  | newline { incrementLine lexbuf; read lexbuf }
+  | eof { EOF }
+  | _ { ignoreLine lexbuf}

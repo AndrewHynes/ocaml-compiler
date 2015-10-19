@@ -14,7 +14,7 @@ let rec printVars = function
   | [] -> ""
   | hd::[] -> ("identifier : " ^ hd)
   | x::y::tl -> ("identifier : " ^ x ^ ", " ) ^ (printVars (y :: tl))
-										  
+
 let rec stringFromExpression = function
   | Value l -> stringFromLangType l
   | Application (e, e2) -> "(Application " ^ (stringFromExpression e) ^ ", " ^ (stringFromExpression e2) ^ ")"
@@ -23,6 +23,7 @@ let rec stringFromExpression = function
   | AssignFunc (v, vs, e) -> "(Assignment: " ^ v ^ " = " ^ (printVars vs) ^ ", (function body: " ^ (stringFromExpression e) ^ "))"
 								
   | PrintExp e -> "(Print: " ^ (stringFromExpression e) ^ ")"
+  | IfThenElse (b, e1, e2) -> "(If " ^ (stringFromExpression b) ^ ", Then (" ^ (stringFromExpression e1) ^ "), Else (" ^ (stringFromExpression e2) ^ "))"
 								      
   | Lambda (l, e) -> "(Lambda (VARIABLES: " ^ (printVars l) ^ "), " ^ (stringFromExpression e) ^ ")"
   | Function (s, l, e) -> "(Function (name: " ^ s ^ ")" ^ ", (args: " ^ (printVars l) ^ ") (function body: " ^ (stringFromExpression e) ^ "))"
@@ -32,11 +33,18 @@ let rec stringFromExpression = function
   | Times (n, m) -> "(Times " ^ (stringFromExpression n) ^ ", " ^  (stringFromExpression m) ^ ")"
   | Minus (n, m) -> "(Minus " ^ (stringFromExpression n) ^ ", " ^  (stringFromExpression m) ^ ")"
   | Div (n, m) -> "(Div " ^ (stringFromExpression n) ^ ", " ^  (stringFromExpression m) ^ ")"
+  | Mod (n, m) -> "(Mod " ^ (stringFromExpression n) ^ ", " ^  (stringFromExpression m) ^ ")"
 
   | Not b -> "(Not " ^ (stringFromExpression b) ^ ")"
   | Or (b, c) -> "(Or " ^ (stringFromExpression b) ^ ", " ^ (stringFromExpression c) ^ ")"
   | And (b, c) -> "(And " ^ (stringFromExpression b) ^ ", " ^ (stringFromExpression c) ^ ")"
-										    
+
+  | EQ (b, c) -> "(Equals " ^ (stringFromExpression b) ^ ", " ^ (stringFromExpression c) ^ ")"
+  | LT (b, c) -> "(LessThan " ^ (stringFromExpression b) ^ ", " ^ (stringFromExpression c) ^ ")"
+  | GT (b, c) -> "(GreaterThan " ^ (stringFromExpression b) ^ ", " ^ (stringFromExpression c) ^ ")"
+  | LTEQ (b, c) -> "(LessThanOrEqualTo " ^ (stringFromExpression b) ^ ", " ^ (stringFromExpression c) ^ ")"
+  | GTEQ (b, c) -> "(GreaterThanOrEqualTo " ^ (stringFromExpression b) ^ ", " ^ (stringFromExpression c) ^ ")"
+						    
 let rec stringFromAST = function
   | [] -> ""
   | hd::tl -> (stringFromExpression hd) ^ (stringFromAST tl)

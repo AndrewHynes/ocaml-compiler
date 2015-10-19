@@ -19,20 +19,38 @@
 %token EXCLAIMATION
 %token LAMBDA
 %token SEMICOLON
+%token IF
+%token THEN
+%token ELSE
+%token EQLOGIC
+%token GT
+%token LT
+%token LTEQ
+%token GTEQ
 %token LBRACK
 %token RBRACK
 %token MINUS
 %token PLUS
 %token TIMES
 %token DIV
+%token MOD
 %token EOF
+%left SEMICOLON
 %left AND
 %left OR
+%left EQLOGIC
+%left GT
+%left LT
+%left LTEQ
+%left GTEQ
+%left EXCLAIMATION
+%left ELSE
 %left MINUS
 %left PLUS
 %left TIMES
 %left DIV
-%left EXCLAIMATION
+%left MOD
+
 %start <Syntax.program> parseTreeTop
 %%
 
@@ -41,7 +59,6 @@ parseTreeTop:
 
 statement:
   | e = expression { e }
-  | p = printT; SEMICOLON+ { p }
   | a = assignmentT; SEMICOLON+ { a }
   | f = func; SEMICOLON+ { Function f }
   | l = lambda  { Lambda l }
@@ -59,15 +76,30 @@ expression:
   | e = expression; PLUS;  e2 = expression { Plus  (e, e2) }
   | e = expression; TIMES; e2 = expression { Times (e, e2) }
   | e = expression; MINUS; e2 = expression { Minus (e, e2) }
-  | e = expression; DIV;   e2 = expression { Div   (e, e2) }
+  | e = expression; DIV;   e2 = expression { Div   (e, e2) }		   
+  | e = expression; MOD;   e2 = expression { Mod   (e, e2) }
 
   | EXCLAIMATION; e = expression { Not e }
   | e = expression; AND; e2 = expression { And (e, e2) }
   | e = expression; OR;  e2 = expression { Or  (e, e2) }
+					 
+  | ite = ifThenElse { ite }
+  | p = printT; SEMICOLON+ { p }
 
+  | e = expression; EQLOGIC; e2 = expression { EQ   (e, e2) }
+  | e = expression; LT; e2 = expression      { LT   (e, e2) }
+  | e = expression; GT; e2 = expression      { GT   (e, e2) }
+  | e = expression; LTEQ; e2 = expression    { LTEQ (e, e2) }
+  | e = expression; GTEQ; e2 = expression    { GTEQ (e, e2) }
+					  
 (*
 funCall:
-  | v = VAR; l = list(expression) { FunCall (v, l) }*)
+  | v = VAR; l = list(expression) { FunCall (v, l) }
+
+lambdaApplication:
+  | l = lambda; 
+
+*)
 
 lambda:
   | LBRACK; l = lambda; RBRACK { l }
@@ -87,5 +119,8 @@ assignmentT:
   | LET; v = VAR; EQUALS; e = expression { AssignExp (v, e) }
   | LET; v = VAR; EQUALS; l = lambda { match l with
 				       | (vs, e) -> AssignFunc (v, vs, e) }
+
+ifThenElse:
+  | IF; b = expression; THEN; e1 = expression; ELSE; e2 = expression { IfThenElse (b, e1, e2) }
 					 
 					 			    

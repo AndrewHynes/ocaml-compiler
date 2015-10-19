@@ -3,27 +3,30 @@ type langType = Bool of bool
 	      | Float of float
 	      | String of string
 	      | Var of string
-			 
-type maths = Plus of maths * maths
-	   | Times of maths * maths
-	   | Div of maths * maths
-	   | Minus of maths * maths
-	   | Value of langType
 
 type expression = Plus of expression * expression
 		| Times of expression * expression
 		| Div of expression * expression
 		| Minus of expression * expression
+		| Mod of expression * expression
 		| Value of langType
 
 		| Not of expression
 		| Or  of expression * expression
-		| And of expression * expression	     
+		| And of expression * expression
+
+		| EQ of expression * expression
+		| LT of expression * expression
+		| GT of expression * expression
+		| LTEQ of expression * expression
+		| GTEQ of expression * expression
 			     
 		| AssignExp of string * expression
 		| AssignVar of string * string
 		(* name of new variable * arguments * body *)
 		| AssignFunc of string * (string list) * expression
+
+		| IfThenElse of expression * expression * expression
 					   
 		| PrintExp of expression
 		| Lambda of lambdaExp
