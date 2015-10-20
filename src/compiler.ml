@@ -1,3 +1,5 @@
+(** This file is the main compiler file that controls the whole compilation process. *)
+
 open Parser
 open Printf
 open Lexing
@@ -44,7 +46,8 @@ let rec stringFromExpression = function
   | GT (b, c) -> "(GreaterThan " ^ (stringFromExpression b) ^ ", " ^ (stringFromExpression c) ^ ")"
   | LTEQ (b, c) -> "(LessThanOrEqualTo " ^ (stringFromExpression b) ^ ", " ^ (stringFromExpression c) ^ ")"
   | GTEQ (b, c) -> "(GreaterThanOrEqualTo " ^ (stringFromExpression b) ^ ", " ^ (stringFromExpression c) ^ ")"
-						    
+
+(** Produces a string representing an abstract syntax tree *)												     
 let rec stringFromAST = function
   | [] -> ""
   | hd::tl -> (stringFromExpression hd) ^ (stringFromAST tl)
@@ -55,6 +58,7 @@ let prettyPrintPosition outx lexbuf =
   fprintf outx "Line number: %d, Position: %d"
     pos.pos_lnum (pos.pos_cnum - pos.pos_bol + 1)
 
+(** Parses the file, but may print an error if it cannot be parsed (such as due to incorrect syntax *)
 let parseWithError lexbuf =
   try stringFromAST (List.map Optimiser.foldConstants (Parser.parseTreeTop Lexer.read lexbuf)) with
   | Lexer.SyntaxError msg ->

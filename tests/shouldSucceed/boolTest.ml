@@ -18,7 +18,10 @@ let tests = [
     ("true", stringToOptimisedAST "(true || false)");
 		
     ("(Not (Or true, false))", stringToAST "!(true || false)");
-    ("false", stringToOptimisedAST "!(true || false)")
+    ("false", stringToOptimisedAST "!(true || false)");
+
+    ("(If (And true, true), Then (1), Else (2))", stringToAST "if true && true then 1 else 2");
+    ("1", stringToOptimisedAST "if true && true then 1 else 2")
       
 ]
 

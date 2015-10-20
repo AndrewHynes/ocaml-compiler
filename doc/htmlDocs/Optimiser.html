@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="previous" href="MainParser.html">
+<link rel="next" href="Syntax.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Compiler" rel="Chapter" href="Compiler.html">
+<link title="MainParser" rel="Chapter" href="MainParser.html">
+<link title="Optimiser" rel="Chapter" href="Optimiser.html">
+<link title="Syntax" rel="Chapter" href="Syntax.html"><title>Optimiser</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="MainParser.html" title="MainParser">Previous</a>
+&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;<a class="post" href="Syntax.html" title="Syntax">Next</a>
+</div>
+<h1>Module <a href="type_Optimiser.html">Optimiser</a></h1>
+
+<pre><span class="keyword">module</span> Optimiser: <code class="code">sig</code> <a href="Optimiser.html">..</a> <code class="code">end</code></pre><div class="info module top">
+An optimiser that optimises the parsed AST by using various techniques.<br>
+</div>
+<hr width="100%">
+
+<pre><span id="VALisMathsOnly"><span class="keyword">val</span> isMathsOnly</span> : <code class="type"><a href="Syntax.html#TYPEexpression">Syntax.expression</a> -> bool</code></pre><div class="info ">
+Checks to see if an expression contains only maths<br>
+</div>
+
+<pre><span id="VALisLogicOnly"><span class="keyword">val</span> isLogicOnly</span> : <code class="type"><a href="Syntax.html#TYPEexpression">Syntax.expression</a> -> bool</code></pre><div class="info ">
+Checks to see if an expression contains only logic<br>
+</div>
+
+<pre><span id="VALevalMaths"><span class="keyword">val</span> evalMaths</span> : <code class="type"><a href="Syntax.html#TYPEexpression">Syntax.expression</a> -> float</code></pre><div class="info ">
+Evaluates a constant expression containing only maths<br>
+</div>
+
+<pre><span id="VALevalLogic"><span class="keyword">val</span> evalLogic</span> : <code class="type"><a href="Syntax.html#TYPEexpression">Syntax.expression</a> -> bool</code></pre><div class="info ">
+Evaluates a constant expression containing only logic<br>
+</div>
+
+<pre><span id="VALfoldConstants"><span class="keyword">val</span> foldConstants</span> : <code class="type"><a href="Syntax.html#TYPEexpression">Syntax.expression</a> -> <a href="Syntax.html#TYPEexpression">Syntax.expression</a></code></pre><div class="info ">
+'Folds' the constants in a single expression, and performs optimisations such:
+<p>
+<ul>
+<li>Replaces maths with constants (e.g. replaces 3 + 3 with 6)</li>
+</ul>
+<ul>
+<li>Replaces boolean expressions with constants (e.g. replaces !false with true)</li>
+</ul>
+<ul>
+<li>Replaces if-then-else statements with the correct branch if the boolean is not dependent on variables</li>
+</ul>
+<ul>
+<li>Does this recursively and fully optimises the AST (for example, it would simplify the expression (lambda _ -&gt; lambda _ -&gt; 6) to (lambda _ -&gt; lambda _ -&gt; 6)</li>
+</ul>
+<br>
+</div>
+</body></html>

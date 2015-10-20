@@ -1,0 +1,258 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="previous" href="Optimiser.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Compiler" rel="Chapter" href="Compiler.html">
+<link title="MainParser" rel="Chapter" href="MainParser.html">
+<link title="Optimiser" rel="Chapter" href="Optimiser.html">
+<link title="Syntax" rel="Chapter" href="Syntax.html"><title>Syntax</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="Optimiser.html" title="Optimiser">Previous</a>
+&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;</div>
+<h1>Module <a href="type_Syntax.html">Syntax</a></h1>
+
+<pre><span class="keyword">module</span> Syntax: <code class="code">sig</code> <a href="Syntax.html">..</a> <code class="code">end</code></pre><div class="info module top">
+Contains the language's syntax, and the abstract data types used by the rest of the compiler.<br>
+</div>
+<hr width="100%">
+
+<pre><code><span id="TYPElangType"><span class="keyword">type</span> <code class="type"></code>langType</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTlangType.Bool"><span class="constructor">Bool</span></span> <span class="keyword">of</span> <code class="type">bool</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTlangType.Int"><span class="constructor">Int</span></span> <span class="keyword">of</span> <code class="type">int</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTlangType.Float"><span class="constructor">Float</span></span> <span class="keyword">of</span> <code class="type">float</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTlangType.String"><span class="constructor">String</span></span> <span class="keyword">of</span> <code class="type">string</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTlangType.Var"><span class="constructor">Var</span></span> <span class="keyword">of</span> <code class="type">string</code></code></td>
+
+</tr></table>
+
+<div class="info ">
+The language's primitive data types<br>
+</div>
+
+
+<pre><code><span id="TYPEexpression"><span class="keyword">type</span> <code class="type"></code>expression</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.Plus"><span class="constructor">Plus</span></span> <span class="keyword">of</span> <code class="type"><a href="Syntax.html#TYPEexpression">expression</a> * <a href="Syntax.html#TYPEexpression">expression</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.Times"><span class="constructor">Times</span></span> <span class="keyword">of</span> <code class="type"><a href="Syntax.html#TYPEexpression">expression</a> * <a href="Syntax.html#TYPEexpression">expression</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.Div"><span class="constructor">Div</span></span> <span class="keyword">of</span> <code class="type"><a href="Syntax.html#TYPEexpression">expression</a> * <a href="Syntax.html#TYPEexpression">expression</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.Minus"><span class="constructor">Minus</span></span> <span class="keyword">of</span> <code class="type"><a href="Syntax.html#TYPEexpression">expression</a> * <a href="Syntax.html#TYPEexpression">expression</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.Mod"><span class="constructor">Mod</span></span> <span class="keyword">of</span> <code class="type"><a href="Syntax.html#TYPEexpression">expression</a> * <a href="Syntax.html#TYPEexpression">expression</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.Value"><span class="constructor">Value</span></span> <span class="keyword">of</span> <code class="type"><a href="Syntax.html#TYPElangType">langType</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.Not"><span class="constructor">Not</span></span> <span class="keyword">of</span> <code class="type"><a href="Syntax.html#TYPEexpression">expression</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.Or"><span class="constructor">Or</span></span> <span class="keyword">of</span> <code class="type"><a href="Syntax.html#TYPEexpression">expression</a> * <a href="Syntax.html#TYPEexpression">expression</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.And"><span class="constructor">And</span></span> <span class="keyword">of</span> <code class="type"><a href="Syntax.html#TYPEexpression">expression</a> * <a href="Syntax.html#TYPEexpression">expression</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.EQ"><span class="constructor">EQ</span></span> <span class="keyword">of</span> <code class="type"><a href="Syntax.html#TYPEexpression">expression</a> * <a href="Syntax.html#TYPEexpression">expression</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.LT"><span class="constructor">LT</span></span> <span class="keyword">of</span> <code class="type"><a href="Syntax.html#TYPEexpression">expression</a> * <a href="Syntax.html#TYPEexpression">expression</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.GT"><span class="constructor">GT</span></span> <span class="keyword">of</span> <code class="type"><a href="Syntax.html#TYPEexpression">expression</a> * <a href="Syntax.html#TYPEexpression">expression</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.LTEQ"><span class="constructor">LTEQ</span></span> <span class="keyword">of</span> <code class="type"><a href="Syntax.html#TYPEexpression">expression</a> * <a href="Syntax.html#TYPEexpression">expression</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.GTEQ"><span class="constructor">GTEQ</span></span> <span class="keyword">of</span> <code class="type"><a href="Syntax.html#TYPEexpression">expression</a> * <a href="Syntax.html#TYPEexpression">expression</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.AssignExp"><span class="constructor">AssignExp</span></span> <span class="keyword">of</span> <code class="type">string * <a href="Syntax.html#TYPEexpression">expression</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.AssignVar"><span class="constructor">AssignVar</span></span> <span class="keyword">of</span> <code class="type">string * string</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.AssignFunc"><span class="constructor">AssignFunc</span></span> <span class="keyword">of</span> <code class="type">string * string list * <a href="Syntax.html#TYPEexpression">expression</a></code></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+The triple should contain: (name of new variable, arguments, body)<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.IfThenElse"><span class="constructor">IfThenElse</span></span> <span class="keyword">of</span> <code class="type"><a href="Syntax.html#TYPEexpression">expression</a> * <a href="Syntax.html#TYPEexpression">expression</a> * <a href="Syntax.html#TYPEexpression">expression</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.PrintExp"><span class="constructor">PrintExp</span></span> <span class="keyword">of</span> <code class="type"><a href="Syntax.html#TYPEexpression">expression</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.Lambda"><span class="constructor">Lambda</span></span> <span class="keyword">of</span> <code class="type"><a href="Syntax.html#TYPElambdaExp">lambdaExp</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.Function"><span class="constructor">Function</span></span> <span class="keyword">of</span> <code class="type"><a href="Syntax.html#TYPEfunct">funct</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.Application"><span class="constructor">Application</span></span> <span class="keyword">of</span> <code class="type"><a href="Syntax.html#TYPEexpression">expression</a> * <a href="Syntax.html#TYPEexpression">expression</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.FunCall"><span class="constructor">FunCall</span></span> <span class="keyword">of</span> <code class="type">string * <a href="Syntax.html#TYPEexpression">expression</a> list</code></code></td>
+
+</tr></table>
+
+<div class="info ">
+A basic statement of the language, which could be a variety of things<br>
+</div>
+
+
+<pre><span id="TYPElambdaExp"><span class="keyword">type</span> <code class="type"></code>lambdaExp</span> = <code class="type">string list * <a href="Syntax.html#TYPEexpression">expression</a></code> </pre>
+<div class="info ">
+A type for lambda expressions<br>
+</div>
+
+
+<pre><span id="TYPEfunct"><span class="keyword">type</span> <code class="type"></code>funct</span> = <code class="type">string * string list * <a href="Syntax.html#TYPEexpression">expression</a></code> </pre>
+<div class="info ">
+A type for functions<br>
+</div>
+
+
+<pre><span id="TYPEprogram"><span class="keyword">type</span> <code class="type"></code>program</span> = <code class="type"><a href="Syntax.html#TYPEexpression">expression</a> list</code> </pre>
+<div class="info ">
+The program type, the type that will be returned by the parser<br>
+</div>
+
+</body></html>

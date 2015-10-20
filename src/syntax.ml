@@ -1,9 +1,13 @@
+(** Contains the language's syntax, and the abstract data types used by the rest of the compiler. *)
+
+(** The language's primitive data types *)
 type langType = Bool of bool
 	      | Int of int
 	      | Float of float
 	      | String of string
 	      | Var of string
 
+(** A basic statement of the language, which could be a variety of things *)
 type expression = Plus of expression * expression
 		| Times of expression * expression
 		| Div of expression * expression
@@ -23,8 +27,8 @@ type expression = Plus of expression * expression
 			     
 		| AssignExp of string * expression
 		| AssignVar of string * string
-		(* name of new variable * arguments * body *)
 		| AssignFunc of string * (string list) * expression
+		(** The triple should contain: (name of new variable, arguments, body) *)
 
 		| IfThenElse of expression * expression * expression
 					   
@@ -34,6 +38,9 @@ type expression = Plus of expression * expression
 		| Application of expression * expression
 		| FunCall of string * (expression list)
  and lambdaExp = string list * expression
+ (** A type for lambda expressions *)
  and funct = string * (string list) * expression
+ (** A type for functions *)
 
+(** The program type, the type that will be returned by the parser *)
 type program = expression list

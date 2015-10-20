@@ -1,6 +1,8 @@
 FLAGS = -r -use-menhir -use-ocamlfind -I
 OCB = ocamlbuild $(FLAGS)
 
+.PHONY: doc
+
 all: mainParser test
 
 mainParser:
@@ -12,3 +14,7 @@ clean:
 
 test:
 	$(OCB) src -I tests -I tests/shouldSucceed -I tests/shouldFail test.native
+
+doc:
+	rm -f doc/htmlDocs/*
+	ocamldoc -html src/*.ml -I _build/src/ -d doc/htmlDocs

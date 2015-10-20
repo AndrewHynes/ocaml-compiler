@@ -1,11 +1,7 @@
-(* Optimises the file 
-Currently has:
-* Constant folding for both numbers and booleans
-*)
-
+(** An optimiser that optimises the parsed AST by using various techniques. *) 
 open Syntax
 
-
+(** Checks to see if an expression contains only maths *)
 let rec isMathsOnly (exp : expression) = match exp with
   | Value l -> (match l with
 	        | Int _ -> true
@@ -19,6 +15,7 @@ let rec isMathsOnly (exp : expression) = match exp with
 							       
   | _ -> false
 	   
+(** Checks to see if an expression contains only logic *)
 let rec isLogicOnly (exp : expression) = match exp with
   | Value l -> (match l with
 	        | Bool _ -> true
@@ -36,8 +33,7 @@ let rec isLogicOnly (exp : expression) = match exp with
 
   | _ -> false
 	   
-(* Note: converts to float 
-   May change that in the future. *)
+(** Evaluates a constant expression containing only maths *)
 let rec evalMaths (exp : expression) = match exp with
   | Value l -> (match l with
 	        | Int i -> float_of_int i
@@ -50,6 +46,7 @@ let rec evalMaths (exp : expression) = match exp with
   | Mod (n, m) -> mod_float (evalMaths n) (evalMaths m)
   | _ -> exit 1 (* Something bad happened *)
 
+(** Evaluates a constant expression containing only logic *)
 let rec evalLogic (exp : expression) = match exp with
   | Value l -> (match l with
 		| Bool b -> b
@@ -67,7 +64,17 @@ let rec evalLogic (exp : expression) = match exp with
 				   
 				     
   | _ -> exit 1 (* Something bad happened *)
-		    
+
+
+(** 'Folds' the constants in a single expression, and performs optimisations such:
+
+- Replaces maths with constants (e.g. replaces 3 + 3 with 6)
+
+- Replaces boolean expressions with constants (e.g. replaces !false with true)
+
+- Replaces if-then-else statements with the correct branch if the boolean is not dependent on variables
+
+- Does this recursively and fully optimises the AST (for example, it would simplify the expression (lambda _ -> lambda _ -> 6) to (lambda _ -> lambda _ -> 6) *)
 let rec foldConstants (exp : expression) = match exp with
   (* Maths *)
   | Plus (n, m) when isMathsOnly (Plus (n, m)) -> Value (Float (evalMaths (Plus (n, m))))

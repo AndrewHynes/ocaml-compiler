@@ -35,7 +35,7 @@
 %token DIV
 %token MOD
 %token EOF
-%left SEMICOLON
+%right SEMICOLON
 %left AND
 %left OR
 %left EQLOGIC
