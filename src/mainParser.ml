@@ -2,7 +2,8 @@
 
 open Compiler
 open Lexing
-
+(*open ToLLVM*)
+       
 (** Parses a file from a given file name *)
 let parseFile fileName =
   let channel = open_in fileName in
@@ -20,6 +21,17 @@ let _ =
        |> Lexing.from_string
        |> parseWithError
        |> print_string;
-       print_newline ())
+	print_newline ())
+
+	 (*
+let _ =
+  if Array.length Sys.argv > 1
+  then parseFile Sys.argv.(1)
+  else (read_line ()
+	|> Lexing.from_string
+        |> toParseTree
+	|> toLLVMNoOptimisations)
+	  *)
+	    
 
 
