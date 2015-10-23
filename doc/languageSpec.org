@@ -107,3 +107,31 @@ func double x = x * 2;
 #+END_SRC
 
 
+* Optimisation
+
+CALF implements a varienty optimisations, including
+
+- Replaces maths with constants (e.g. replaces 3 + 3 with 6)
+
+- Replaces boolean expressions with constants (e.g. replaces !false with true)
+
+- Replaces if-then-else statements with the correct branch if the boolean is not dependent on variables
+
+- Does this recursively and fully optimises the AST (for example, it would simplify the expression (lambda _ -> lambda _ -> 6) to (lambda _ -> lambda _ -> 6)
+
+To find more about the optimisations, see the documentation found at htmlDocs/optimiser.ml. This would, for example, optimise the following:
+
+#+BEGIN_SRC language
+let x = 11 * 2;
+if (true && false)
+then 5
+else 3 + 7
+#+END_SRC
+
+To:
+
+#+BEGIN_SRC language
+let x = 22;
+10
+#+END_SRC
+

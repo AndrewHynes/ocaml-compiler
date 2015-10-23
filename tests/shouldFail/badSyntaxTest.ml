@@ -3,11 +3,11 @@ open TestHelpers
 let tests = [
     
     (errorString, stringToAST "1 +
-2 +
-  !");
+			       2 +
+			       !");
     (errorString, stringToOptimisedAST "1 +
-2 +
-  !");
+					2 +
+					!");
     
     (errorString, stringToAST "()");
     (errorString, stringToOptimisedAST "()");
@@ -15,10 +15,24 @@ let tests = [
     (errorString, stringToAST "~~~");
     (errorString, stringToOptimisedAST "~~~");
 
-      
+    
     (errorString, stringToAST "print x 3 + 3");
-    (errorString, stringToOptimisedAST "print x 3 + 3")
+    (errorString, stringToOptimisedAST "print x 3 + 3");
 
+    (errorString, stringToAST "1+");
+    (errorString, stringToOptimisedAST "1+");
+
+    (errorString, stringToAST "1-");
+    (errorString, stringToOptimisedAST "1-");
+
+    (errorString, stringToAST "1*");
+    (errorString, stringToOptimisedAST "1*");
+
+    (errorString, stringToAST "1/");
+    (errorString, stringToOptimisedAST "1/");
+
+    (errorString, stringToAST "1>");
+    (errorString, stringToOptimisedAST "1>")
       
-]
+  ]
 

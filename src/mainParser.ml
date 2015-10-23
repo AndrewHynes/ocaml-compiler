@@ -23,7 +23,10 @@ let _ =
        |> print_string;
 	print_newline ())
 
+
+
 	 (*
+
 let _ =
   if Array.length Sys.argv > 1
   then parseFile Sys.argv.(1)

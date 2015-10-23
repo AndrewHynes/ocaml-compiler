@@ -42,7 +42,7 @@ let toLang (p : program) =
 		  | _ -> exit 1)*)
     | Plus (n, m) -> add (i32 (getInt n)) (i32 (getInt m))
     | _ -> exit 1
-      in
+  in
 
   let rec genLLVM = function
     | hd::_ -> let (m, x1) = M.local m T.i32 "" in
@@ -52,8 +52,8 @@ let toLang (p : program) =
 						     ret x1;]] in
 	       let m = M.definition m f in
 	       P.modul (P.empty_env ()) Format.std_formatter m.m_module
-    | _ -> exit 1 in
-  genLLVM p
+    | _ -> exit 1
+  in genLLVM p
 
 
 let toParseTree (l : Lexing.lexbuf) = (Parser.parseTreeTop Lexer.read l)

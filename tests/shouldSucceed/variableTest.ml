@@ -11,7 +11,10 @@ let tests = [
     
     ("(Assignment: x = (Plus 300, 500))", stringToAST "let x = 300 + 500;");
     ("(Assignment: x = 800.)", stringToOptimisedAST "let x = 300 + 500;");
-      
+
+    ("(Assignment: x = (Plus 300, 500))(Assignment: y = (Plus 100, 200))", stringToAST "let x = 300 + 500; let y = 100 + 200;");
+    ("(Assignment: x = 800.)(Assignment: y = 300.)", stringToOptimisedAST "let x = 300 + 500; let y = 100 + 200;");
+    
     ("(Assignment: x = 3)(Assignment: y = 8)(Print: (Plus x, y))", stringToAST "let x = 3;let y = 8;print (x + y);");
     ("(Assignment: x = 3)(Assignment: y = 8)(Print: (Plus x, y))", stringToOptimisedAST "let x = 3;let y = 8;print (x + y);");
 

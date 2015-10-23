@@ -7,11 +7,11 @@ let rec isMathsOnly (exp : expression) = match exp with
 	        | Int _ -> true
 		| Float _ -> true
 	        | _ -> false)
-  | Plus (n, m) -> true && isMathsOnly n && isMathsOnly m
-  | Times (n, m) -> true && isMathsOnly n && isMathsOnly m
-  | Minus (n, m) -> true && isMathsOnly n && isMathsOnly m
-  | Div (n, m) -> true && isMathsOnly n && isMathsOnly m
-  | Mod (n, m) -> true && isMathsOnly n && isMathsOnly m
+  | Plus (n, m)  -> isMathsOnly n && isMathsOnly m
+  | Times (n, m) -> isMathsOnly n && isMathsOnly m
+  | Minus (n, m) -> isMathsOnly n && isMathsOnly m
+  | Div (n, m)   -> isMathsOnly n && isMathsOnly m
+  | Mod (n, m)   -> isMathsOnly n && isMathsOnly m
 							       
   | _ -> false
 	   
@@ -21,15 +21,15 @@ let rec isLogicOnly (exp : expression) = match exp with
 	        | Bool _ -> true
 	        | _ -> false)
 		 
-  | Not b -> true && isLogicOnly b
-  | Or (b, c) -> true && isLogicOnly b && isLogicOnly c
-  | And (b, c) -> true && isLogicOnly b && isLogicOnly c
+  | Not b -> isLogicOnly b
+  | Or (b, c) -> isLogicOnly b && isLogicOnly c
+  | And (b, c) -> isLogicOnly b && isLogicOnly c
 
-  | EQ (n, m) -> true && isMathsOnly n && isMathsOnly m
-  | LT (n, m) -> true && isMathsOnly n && isMathsOnly m
-  | GT (n, m) -> true && isMathsOnly n && isMathsOnly m
-  | LTEQ (n, m) -> true && isMathsOnly n && isMathsOnly m
-  | GTEQ (n, m) -> true && isMathsOnly n && isMathsOnly m
+  | EQ (n, m)   -> isMathsOnly n && isMathsOnly m
+  | LT (n, m)   -> isMathsOnly n && isMathsOnly m
+  | GT (n, m)   -> isMathsOnly n && isMathsOnly m
+  | LTEQ (n, m) -> isMathsOnly n && isMathsOnly m
+  | GTEQ (n, m) -> isMathsOnly n && isMathsOnly m
 
   | _ -> false
 	   
