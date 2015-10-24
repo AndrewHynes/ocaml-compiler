@@ -72,7 +72,7 @@ expression:
   | b = BOOL { Value (Bool b) }
 
   | LBRACK; e = expression; RBRACK { e }
-	     
+
   | e = expression; PLUS;  e2 = expression { Plus  (e, e2) }
   | e = expression; TIMES; e2 = expression { Times (e, e2) }
   | e = expression; MINUS; e2 = expression { Minus (e, e2) }

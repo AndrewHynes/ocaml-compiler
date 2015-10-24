@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="next" href="Compiler.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="AsmGen" rel="Chapter" href="AsmGen.html">
+<link title="Compiler" rel="Chapter" href="Compiler.html">
+<link title="LlvmData" rel="Chapter" href="LlvmData.html">
+<link title="MainParser" rel="Chapter" href="MainParser.html">
+<link title="Optimiser" rel="Chapter" href="Optimiser.html">
+<link title="Syntax" rel="Chapter" href="Syntax.html"><title>AsmGen</title>
+</head>
+<body>
+<div class="navbar">&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;<a class="post" href="Compiler.html" title="Compiler">Next</a>
+</div>
+<h1>Module <a href="type_AsmGen.html">AsmGen</a></h1>
+
+<pre><span class="keyword">module</span> AsmGen: <code class="code">sig</code> <a href="AsmGen.html">..</a> <code class="code">end</code></pre><hr width="100%">
+
+<pre><span id="EXCEPTIONCompilationError"><span class="keyword">exception</span> CompilationError</span> <span class="keyword">of</span> <code class="type">string</code></pre>
+
+<pre><span id="VALasm_prefix"><span class="keyword">val</span> asm_prefix</span> : <code class="type">string</code></pre>
+<pre><span id="VALasm_suffix"><span class="keyword">val</span> asm_suffix</span> : <code class="type">string</code></pre>
+<pre><span id="VALasm_add"><span class="keyword">val</span> asm_add</span> : <code class="type">string</code></pre>
+<pre><span id="VALasm_mul"><span class="keyword">val</span> asm_mul</span> : <code class="type">string</code></pre>
+<pre><span id="VALasm_div"><span class="keyword">val</span> asm_div</span> : <code class="type">string</code></pre>
+<pre><span id="VALasm_mod"><span class="keyword">val</span> asm_mod</span> : <code class="type">string</code></pre>
+<pre><span id="VALasm_sub"><span class="keyword">val</span> asm_sub</span> : <code class="type">string</code></pre>
+<pre><span id="VALexpToAsm"><span class="keyword">val</span> expToAsm</span> : <code class="type"><a href="Syntax.html#TYPEexpression">Syntax.expression</a> -> string</code></pre>
+<pre><span id="VALprogramToAsm"><span class="keyword">val</span> programToAsm</span> : <code class="type"><a href="Syntax.html#TYPEprogram">Syntax.program</a> -> string</code></pre></body></html>

@@ -2,7 +2,10 @@
 
 open Compiler
 open Lexing
-(*open ToLLVM*)
+(*open Llvm
+open ToLLVM*)
+
+let toParseTree (l : Lexing.lexbuf) = (Parser.parseTreeTop Lexer.read l)
        
 (** Parses a file from a given file name *)
 let parseFile fileName =
@@ -18,14 +21,38 @@ let _ =
   if Array.length Sys.argv > 1
   then parseFile Sys.argv.(1)
   else (read_line ()
+	|> Lexing.from_string
+        |> toParseTree
+	|> AsmGen.programToAsm
+	|> print_string)
+
+	 (*
+let _ =
+  if Array.length Sys.argv > 1
+  then parseFile Sys.argv.(1)
+  else (read_line ()
+	|> Lexing.from_string
+        |> toParseTree
+	|> AsmGen.programToAsm
+	|> print_string)
+
+let _ =
+  if Array.length Sys.argv > 1
+  then parseFile Sys.argv.(1)
+  else (read_line ()
+       |> Lexing.from_string
+       |> toParseTree
+       |> LlvmData.pToL; dump_module LlvmData.theModule)
+
+let _ =
+  if Array.length Sys.argv > 1
+  then parseFile Sys.argv.(1)
+  else (read_line ()
        |> Lexing.from_string
        |> parseWithError
        |> print_string;
 	print_newline ())
 
-
-
-	 (*
 
 let _ =
   if Array.length Sys.argv > 1
