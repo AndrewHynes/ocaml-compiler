@@ -18,6 +18,7 @@ let asm_suffix = "
 \tmov $0, %rdi 
 \tcall _exit\n"
 
+(* Maths *)	   
 let asm_add = "
 \tpop %rdi
 \tpop %rsi
@@ -50,6 +51,23 @@ let asm_sub = "
 \tsub %rdi, %rsi
 \tpush %rsi\n"
 
+(* Logic *)
+(* 
+Useful links:
+https://en.wikipedia.org/wiki/FLAGS_register
+http://unixwiz.net/techtips/x86-jumps.html
+*)
+let asm_eq = "
+\tpop %rdi
+\tpop %rsi
+\tcmp %rdi, %rsi
+\tpushf
+\tpop %rsi
+\tshr $6, %rsi
+\tand $1, %rsi
+\tpush %rsi\n"
+
+
 (** Converts one expression to assembly *)
 let rec expToAsm (e : expression) = match e with
   | Value l -> (match l with
@@ -64,6 +82,8 @@ let rec expToAsm (e : expression) = match e with
   | Times (n, m) -> (expToAsm n) ^ (expToAsm m) ^ asm_mul
   | Div (n, m) -> (expToAsm n) ^ (expToAsm m) ^ asm_div						  
   | Mod (n, m) -> (expToAsm n) ^ (expToAsm m) ^ asm_mod
+
+  | EQ (p, q) -> (expToAsm p) ^ (expToAsm q) ^ asm_eq
 						  
 						    
   | _ -> exit 1
