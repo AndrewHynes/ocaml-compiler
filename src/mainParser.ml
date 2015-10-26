@@ -6,14 +6,14 @@ open Lexing
 open ToLLVM*)
 
 let toParseTree (l : Lexing.lexbuf) = (Parser.parseTreeTop Lexer.read l)
-       
+					
 (** Parses a file from a given file name *)
 let parseFile fileName =
   let channel = open_in fileName in
   Lexing.from_channel channel
-  |> parseWithError
+  |> toParseTree
+  |> AsmGen.programToAsm
   |> print_string;
-  print_newline ();
   close_in channel
 
 (** The 'main' function, checks if a file name is given, if it is, parses that, otherwise acts as an interpreter *)
@@ -27,6 +27,14 @@ let _ =
 	|> print_string)
 
 	 (*
+let parseFile fileName =
+  let channel = open_in fileName in
+  Lexing.from_channel channel
+  |> parseWithError
+  |> print_string;
+  print_newline ();
+  close_in channel
+
 let _ =
   if Array.length Sys.argv > 1
   then parseFile Sys.argv.(1)
@@ -62,6 +70,6 @@ let _ =
         |> toParseTree
 	|> toLLVMNoOptimisations)
 	  *)
-	    
+	 
 
 
