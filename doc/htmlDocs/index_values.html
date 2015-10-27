@@ -8,6 +8,7 @@
 <link title="Index of values" rel=Appendix href="index_values.html">
 <link title="Index of modules" rel=Appendix href="index_modules.html">
 <link title="AsmGen" rel="Chapter" href="AsmGen.html">
+<link title="AsmSnippets" rel="Chapter" href="AsmSnippets.html">
 <link title="Compiler" rel="Chapter" href="Compiler.html">
 <link title="LlvmData" rel="Chapter" href="LlvmData.html">
 <link title="MainParser" rel="Chapter" href="MainParser.html">
@@ -20,19 +21,44 @@
 <h1>Index of values</h1>
 <table>
 <tr><td align="left"><br>A</td></tr>
-<tr><td><a href="AsmGen.html#VALasm_add">asm_add</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<tr><td><a href="AsmSnippets.html#VALasm_add">asm_add</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
 <td></td></tr>
-<tr><td><a href="AsmGen.html#VALasm_div">asm_div</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<tr><td><a href="AsmSnippets.html#VALasm_and">asm_and</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
 <td></td></tr>
-<tr><td><a href="AsmGen.html#VALasm_mod">asm_mod</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<tr><td><a href="AsmSnippets.html#VALasm_dataSegment">asm_dataSegment</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
 <td></td></tr>
-<tr><td><a href="AsmGen.html#VALasm_mul">asm_mul</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<tr><td><a href="AsmSnippets.html#VALasm_div">asm_div</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
 <td></td></tr>
-<tr><td><a href="AsmGen.html#VALasm_prefix">asm_prefix</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<tr><td><a href="AsmSnippets.html#VALasm_eq">asm_eq</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
 <td></td></tr>
-<tr><td><a href="AsmGen.html#VALasm_sub">asm_sub</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<tr><td><a href="AsmSnippets.html#VALasm_gt">asm_gt</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
 <td></td></tr>
-<tr><td><a href="AsmGen.html#VALasm_suffix">asm_suffix</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<tr><td><a href="AsmSnippets.html#VALasm_gteq">asm_gteq</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
+<td></td></tr>
+<tr><td><a href="AsmSnippets.html#VALasm_ite">asm_ite</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
+<td></td></tr>
+<tr><td><a href="AsmSnippets.html#VALasm_lt">asm_lt</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
+<td></td></tr>
+<tr><td><a href="AsmSnippets.html#VALasm_lteq">asm_lteq</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
+<td></td></tr>
+<tr><td><a href="AsmSnippets.html#VALasm_mod">asm_mod</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
+<td></td></tr>
+<tr><td><a href="AsmSnippets.html#VALasm_mul">asm_mul</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
+<td></td></tr>
+<tr><td><a href="AsmSnippets.html#VALasm_negate">asm_negate</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
+<td></td></tr>
+<tr><td><a href="AsmSnippets.html#VALasm_neq">asm_neq</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
+<td></td></tr>
+<tr><td><a href="AsmSnippets.html#VALasm_or">asm_or</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
+<td></td></tr>
+<tr><td><a href="AsmSnippets.html#VALasm_prefix">asm_prefix</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
+<td></td></tr>
+<tr><td><a href="AsmSnippets.html#VALasm_sub">asm_sub</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
+<td></td></tr>
+<tr><td><a href="AsmSnippets.html#VALasm_suffix">asm_suffix</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
+<td></td></tr>
+<tr><td align="left"><br>C</td></tr>
+<tr><td><a href="AsmSnippets.html#VALcmpAndPushSFOF">cmpAndPushSFOF</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
 <td></td></tr>
 <tr><td align="left"><br>E</td></tr>
 <tr><td><a href="Optimiser.html#VALevalLogic">evalLogic</a> [<a href="Optimiser.html">Optimiser</a>]</td>
@@ -46,8 +72,16 @@ Evaluates a constant expression containing only maths
 </div>
 </td></tr>
 <tr><td><a href="AsmGen.html#VALexpToAsm">expToAsm</a> [<a href="AsmGen.html">AsmGen</a>]</td>
-<td></td></tr>
+<td><div class="info">
+Converts one expression to assembly
+</div>
+</td></tr>
 <tr><td align="left"><br>F</td></tr>
+<tr><td><a href="AsmGen.html#VALfindVarName">findVarName</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<td><div class="info">
+Finds the name of a variable as written in the output assembly
+</div>
+</td></tr>
 <tr><td><a href="Optimiser.html#VALfoldConstants">foldConstants</a> [<a href="Optimiser.html">Optimiser</a>]</td>
 <td><div class="info">
 'Folds' the constants in a single expression, and performs optimisations such:
@@ -62,6 +96,15 @@ Checks to see if an expression contains only logic
 <tr><td><a href="Optimiser.html#VALisMathsOnly">isMathsOnly</a> [<a href="Optimiser.html">Optimiser</a>]</td>
 <td><div class="info">
 Checks to see if an expression contains only maths
+</div>
+</td></tr>
+<tr><td align="left"><br>L</td></tr>
+<tr><td><a href="AsmGen.html#VALlabels">labels</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<td></td></tr>
+<tr><td align="left"><br>M</td></tr>
+<tr><td><a href="AsmGen.html#VALmakeDataSegment">makeDataSegment</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<td><div class="info">
+Adds to the data segment of the output for each variable we need space for
 </div>
 </td></tr>
 <tr><td align="left"><br>P</td></tr>
@@ -80,7 +123,10 @@ Parses the file, but may print an error if it cannot be parsed (such as due to i
 <tr><td><a href="Compiler.html#VALprintVars">printVars</a> [<a href="Compiler.html">Compiler</a>]</td>
 <td></td></tr>
 <tr><td><a href="AsmGen.html#VALprogramToAsm">programToAsm</a> [<a href="AsmGen.html">AsmGen</a>]</td>
-<td></td></tr>
+<td><div class="info">
+Converts a program to assembly
+</div>
+</td></tr>
 <tr><td align="left"><br>S</td></tr>
 <tr><td><a href="Compiler.html#VALstringFromAST">stringFromAST</a> [<a href="Compiler.html">Compiler</a>]</td>
 <td><div class="info">
@@ -93,6 +139,12 @@ Produces a string representing an abstract syntax tree
 <td></td></tr>
 <tr><td align="left"><br>T</td></tr>
 <tr><td><a href="MainParser.html#VALtoParseTree">toParseTree</a> [<a href="MainParser.html">MainParser</a>]</td>
+<td></td></tr>
+<tr><td align="left"><br>V</td></tr>
+<tr><td><a href="AsmGen.html#VALvarPositions">varPositions</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<td></td></tr>
+<tr><td align="left"><br>Z</td></tr>
+<tr><td><a href="AsmSnippets.html#VALzfE1">zfE1</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
 <td></td></tr>
 </table>
 </body>

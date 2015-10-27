@@ -1,35 +1,36 @@
 Time taken using the "time" bash command:
 
 ARITHMETIC:
-[andrew@haru benchmarks]$ time ./arithmetic
-180
+[andrew@haru arithmeticBenchmarks]$ time ./arithmetic
+10311
 
 real	0m0.001s
 user	0m0.000s
 sys	0m0.000s
 [andrew@haru arithmeticBenchmarks]$ time ./cArithmetic 
-180
+10311
 
 real	0m0.001s
 user	0m0.000s
-sys	0m0.0
+sys	0m0.000s
 [andrew@haru arithmeticBenchmarks]$ time ./ocamlArithmetic 
-180
+10311
 
 real	0m0.003s
 user	0m0.000s
 sys	0m0.000s
-[andrew@haru benchmarks]$ time python3 arithmetic.py 
-180
+[andrew@haru arithmeticBenchmarks]$ time python arithmetic.py
+RecursionError: maximum recursion depth exceeded during compilation
 
-real	0m0.038s
-user	0m0.040s
-sys	0m0.000s
+real	0m0.062s
+user	0m0.057s
+sys	0m0.003s
+
 
 CALF: .001s
 C: .001s
 OCaml: .003s
-Python: .038s
+Python: could not compile
 
 
 

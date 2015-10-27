@@ -20,7 +20,7 @@ let rec printVars = function
 let rec stringFromExpression = function
   | Value l -> stringFromLangType l
   | Application (e, e2) -> "(Application " ^ (stringFromExpression e) ^ ", " ^ (stringFromExpression e2) ^ ")"
-  | AssignVar (s, t) -> "(Assignment: " ^ s ^ " = variable " ^ t ^ ")"
+  (*| AssignVar (s, t) -> "(Assignment: " ^ s ^ " = variable " ^ t ^ ")"*)
   | AssignExp (s, e) -> "(Assignment: " ^ s ^ " = " ^ (stringFromExpression e) ^ ")"
   | AssignFunc (v, vs, e) -> "(Assignment: " ^ v ^ " = " ^ (printVars vs) ^ ", (function body: " ^ (stringFromExpression e) ^ "))"
 								
