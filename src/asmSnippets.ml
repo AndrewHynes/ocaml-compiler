@@ -20,9 +20,9 @@ main:
 let asm_suffix = "
 \tlea format(%rip), %rdi 
 \tpop %rsi
-\tcall printf 
+\tcall printf
 \tmov $0, %rdi 
-\tcall _exit\n"
+\tcall exit\n"
 
 (* Maths *)	   
 let asm_add = "

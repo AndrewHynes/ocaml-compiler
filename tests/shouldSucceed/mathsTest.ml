@@ -34,3 +34,17 @@ let tests = [
       
   ]
 
+let rtTests = [
+
+    ("180\n", (stringToAsm, "100 + (20 * 4) + 1 - 1"));
+    ("700\n", (stringToAsm, "(300 + 400)"));
+    ("700\n", (stringToAsm, "300 + 400"));
+    ("38\n", (stringToAsm, "3 +5 * 7"));
+    ("38\n", (stringToOptimisedAsm, "3 +5 * 7"));
+
+    
+    ("1\n", (stringToAsm, "if true then 1 else 2"));
+    ("1\n", (stringToOptimisedAsm, "if true then 1 else 2"));      
+
+  ]
+		

@@ -36,3 +36,40 @@ let tests = [
       
   ]
 
+let rtTests = [
+
+    (errorString, (stringToAsm, "1 +
+				 2 +
+				 !"));
+    (errorString, (stringToOptimisedAsm, "1 +
+					  2 +
+					  !"));
+    
+    (errorString, (stringToAsm, "()"));
+    (errorString, (stringToOptimisedAsm, "()"));
+
+    (errorString, (stringToAsm, "~~~"));
+    (errorString, (stringToOptimisedAsm, "~~~"));
+
+    
+    (errorString, (stringToAsm, "print x 3 + 3"));
+    (errorString, (stringToOptimisedAsm, "print x 3 + 3"));
+
+    (errorString, (stringToAsm, "1+"));
+    (errorString, (stringToOptimisedAsm, "1+"));
+
+    (errorString, (stringToAsm, "1-"));
+    (errorString, (stringToOptimisedAsm, "1-"));
+
+    (errorString, (stringToAsm, "1*"));
+    (errorString, (stringToOptimisedAsm, "1*"));
+
+    (errorString, (stringToAsm, "1/"));
+    (errorString, (stringToOptimisedAsm, "1/"));
+    
+    (errorString, (stringToAsm, "1>"));
+    (errorString, (stringToOptimisedAsm, "1>"))
+
+  ]
+
+		

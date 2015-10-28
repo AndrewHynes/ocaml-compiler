@@ -4,11 +4,16 @@ open TestHelpers
 (* A list of (expected, actual) *)
 let tests = BoolTest.tests @ MathsTest.tests @ LambdaTest.tests @ VariableTest.tests @ BadSyntaxTest.tests
 
-let rtTests = RunTimeTests.tests
-											 
+let runtimeTests = BoolTest.rtTests @ MathsTest.rtTests @ VariableTest.rtTests @ BadSyntaxTest.rtTests
+
 let _ =
   let failed = indexesOfFalses @@ runTests tests in
-  if (failed = [])
-  then print_string "All tests passed!\n"
-  else printList (prettyStringTests tests failed)
+  let runtimeFailed = indexesOfFalses @@ runRuntimeTests runtimeTests in
+  (if (failed = [])
+   then print_string "All syntax/parsing tests passed!\n"
+   else printList (prettyStringTests tests failed));
+  (if (runtimeFailed = [])
+   then print_string "All runtime tests passed!\n"
+   else printList (prettyStringRTTests runtimeTests runtimeFailed));
+  cleanUp ()
 

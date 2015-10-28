@@ -31,6 +31,8 @@ let rec expToAsm (e : expression) = match e with
 		| Bool b -> (match b with
 			     | true ->" \tpush $1\n"
 			     | false -> "\tpush $0\n")
+		(* Temporarily just rounds floats down! *)
+		| Float f -> "\tpush $" ^  (string_of_int (int_of_float (floor f))) ^ "\n"
 		| Var v -> "\tpush " ^ (findVarName v (!varPositions)) ^ "(%rip)\n" 
 		| _ -> exit 1)
 

@@ -61,8 +61,7 @@ let rec evalLogic (exp : expression) = match exp with
   | GT (n, m) -> (evalMaths n) > (evalMaths m)
   | LTEQ (n, m) -> (evalMaths n) <= (evalMaths m)
   | GTEQ (n, m) -> (evalMaths n) >= (evalMaths m)
-				   
-				     
+					     
   | _ -> exit 1 (* Something bad happened *)
 
 
