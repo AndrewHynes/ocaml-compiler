@@ -15,6 +15,7 @@ format:
 \t.globl main
 main:
 \tpush $0
+\tmovq %rsp, %rbp
 \n"
 
 let asm_suffix = "
@@ -153,11 +154,17 @@ let asm_getVar i = "
 
 \tpush %rsi"
 
+(** Generates the assembly for the assignment of variables *)
 let asm_asnVar i = "
 \tpop %rsi
+\tmovq %rsi, -" ^ (string_of_int i) ^ "(%rbp)\n"
+
+(** Generates the assembly for the assignment of variables, and makes room for two variables on the stack *)
+let asm_asnVarAndMakeRoom i = "
+\tpop %rsi
 \tsubq $16, %rsp
-\tmovq %rsi, -" ^ (string_of_int i) ^ "(%rbp)
-"
+\tmovq %rsi, -" ^ (string_of_int i) ^ "(%rbp)\n"
+					
 (* TODO: add to %rsp at end of function *)
 		
 (*

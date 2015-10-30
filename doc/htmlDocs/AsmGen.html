@@ -13,7 +13,6 @@
 <link title="AsmGen" rel="Chapter" href="AsmGen.html">
 <link title="AsmSnippets" rel="Chapter" href="AsmSnippets.html">
 <link title="Compiler" rel="Chapter" href="Compiler.html">
-<link title="LlvmData" rel="Chapter" href="LlvmData.html">
 <link title="MainParser" rel="Chapter" href="MainParser.html">
 <link title="Optimiser" rel="Chapter" href="Optimiser.html">
 <link title="Syntax" rel="Chapter" href="Syntax.html"><title>AsmGen</title>
@@ -33,6 +32,15 @@ Generates assembly code from a syntax tree<br>
 
 <pre><span id="VALlabels"><span class="keyword">val</span> labels</span> : <code class="type">string list Pervasives.ref</code></pre>
 <pre><span id="VALvarPositions"><span class="keyword">val</span> varPositions</span> : <code class="type">(string * string) list Pervasives.ref</code></pre>
+<pre><span id="VALfindVarPos"><span class="keyword">val</span> findVarPos</span> : <code class="type">string -> (string * 'a) list -> 'a</code></pre><div class="info ">
+Finds the position in the stack of a variable as written in the output assembly<br>
+</div>
+
+<pre><span id="VALrmVar"><span class="keyword">val</span> rmVar</span> : <code class="type">'a -> ('a * 'b) list -> ('a * 'b) list</code></pre><div class="info ">
+Removes a variable from the list<br>
+</div>
+
+<pre><span id="VALaddVar"><span class="keyword">val</span> addVar</span> : <code class="type">string -> int</code></pre>
 <pre><span id="VALfindVarName"><span class="keyword">val</span> findVarName</span> : <code class="type">string -> (string * 'a) list -> 'a</code></pre><div class="info ">
 Finds the name of a variable as written in the output assembly<br>
 </div>
