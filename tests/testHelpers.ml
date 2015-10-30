@@ -18,11 +18,13 @@ let stringToOptimisedAsm s = try AsmGen.programToAsm (List.map Optimiser.foldCon
 			     with
 			     | Parser.Error -> errorString
 			     | Lexer.SyntaxError msg -> errorString
+			     | AsmGen.CompilationError msg -> errorString
 
 let stringToAsm s = try AsmGen.programToAsm @@ parseString s
 		    with
 		    | Parser.Error -> errorString
 		    | Lexer.SyntaxError msg -> errorString
+		    | AsmGen.CompilationError msg -> errorString
 						 
 						 
 let runTests t = List.map (fun (a, b) -> a = b) t

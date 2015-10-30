@@ -9,6 +9,25 @@ exception CompilationError of string
 let labels = ref []
 
 let varPositions = ref []
+		       
+let (varPositions2 : ((string * int) list) ref) = ref []
+
+(** Finds the position in the stack of a variable as written in the output assembly *)
+let rec findVarPos x = function
+  | [] -> raise @@ CompilationError ("Variable " ^ x ^ " never initialised.")
+  | (a, b)::_ when x = a -> b
+  | _::tl -> findVarPos x tl
+
+(** Removes a variable from the list *)
+let rec rmVar x = function
+  | [] -> []
+  | (a, b)::tl when x = a -> tl
+  | hd::tl -> hd::(rmVar x tl)
+
+let addVar v = let len = List.length !varPositions2 + 1 in
+	       varPositions2 := (v, (len * 4)) :: !varPositions2;
+               (len * 4)
+
 
 (** Finds the name of a variable as written in the output assembly *)
 let rec findVarName x = function
@@ -21,9 +40,8 @@ let makeDataSegment (e : expression) = match e with
   | AssignExp (s, _) -> let name = "v" ^ (string_of_int @@ List.length !varPositions) in
 			varPositions := (s, name) :: !varPositions;
 			name ^ ":\t.space 8\n"
-			
   | _ -> ""
-		
+	   
 (** Converts one expression to assembly *)
 let rec expToAsm (e : expression) = match e with
   | Value l -> (match l with
@@ -33,7 +51,9 @@ let rec expToAsm (e : expression) = match e with
 			     | false -> "\tpush $0\n")
 		(* Temporarily just rounds floats down! *)
 		| Float f -> "\tpush $" ^  (string_of_int (int_of_float (floor f))) ^ "\n"
-		| Var v -> "\tpush " ^ (findVarName v (!varPositions)) ^ "(%rip)\n" 
+		| Var v -> "\tpush " ^ (findVarName v (!varPositions)) ^ "(%rip)\n"
+		(*| Var v -> print_string "Var v\n";
+		   "\tpush -" ^ (string_of_int @@ findVarPos v (!varPositions2)) ^ "(%rsp)\n"*)
 		| _ -> exit 1)
 
   | Plus (n, m) -> (expToAsm n) ^ (expToAsm m) ^ asm_add
@@ -53,6 +73,14 @@ let rec expToAsm (e : expression) = match e with
   | Or (p, q) -> (expToAsm p) ^ (expToAsm q) ^ asm_or
 
   | AssignExp (s, e) -> (expToAsm e) ^ "\tpop " ^ (findVarName s (!varPositions)) ^ "(%rip)\n"
+  (*| AssignExp (s, e) -> let len = (List.length !varPositions2) + 1 in
+			let () = print_string "first\n" in
+			let () = varPositions2 := ((s, (len * 4)) :: !varPositions2) in
+			let () = print_string "second\n" in
+			(expToAsm e) ^ (asm_asnVar (len * 4)) *)
+  (*| AssignExp (s, e) -> print_string "AsnExp\n";
+			let pos = addVar s in
+			(expToAsm e) ^ (asm_asnVar pos)*)
 
   | IfThenElse (b, e1, e2) -> let labelName = "l" ^ (string_of_int @@ List.length !labels) in
 			      let endLabel = labelName ^ "e" in
@@ -70,7 +98,15 @@ let rec expToAsm (e : expression) = match e with
 let programToAsm (p : program) =
   let dataSeg = asm_dataSegment ^ (List.fold_right (fun e -> (^) (makeDataSegment e)) p "") in
   dataSeg ^ asm_prefix ^ (List.fold_right (fun e -> (^) (expToAsm e)) p "") ^ asm_suffix
-  (* Note: does not ignore nonesense programs such as 3 + 3 3 + 3 *)
+ (* Note: does not ignore nonesense programs such as 3 + 3 3 + 3 *)
+(*let programToAsm (p : program) =
+  let rec helper (p : program) = match p with
+  | [] -> ""
+  | hd::tl -> (match hd with
+	       |AssignExp _ -> print_string "Assign\n"
+	       | _ -> print_string "Not assign\n"); (expToAsm hd) ^ helper tl
+  in
+  asm_prefix ^ (helper p) ^ asm_suffix*)
 
 (*
 let programToAsm (p : program) =

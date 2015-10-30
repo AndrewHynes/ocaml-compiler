@@ -146,6 +146,19 @@ let asm_ite labelName = "
 \tcmp $0, %rsi
 \tjne " ^ labelName ^ "\n"
 
+(* Variable from the stack *)
+let asm_getVar i = "
+\t 
+\tpop %rsi -" ^ (string_of_int i) ^ "(%thing)
+
+\tpush %rsi"
+
+let asm_asnVar i = "
+\tpop %rsi
+\tsubq $16, %rsp
+\tmovq %rsi, -" ^ (string_of_int i) ^ "(%rbp)
+"
+(* TODO: add to %rsp at end of function *)
 		
 (*
 let asm_prefix = " \t.section __TEXT,__cstring,cstring_literals
@@ -155,5 +168,20 @@ format:
 \t.globl _main 
 _main: 
 \tpush $0"
+
+function calls:
+\tpushq %rbp
+\tmovq %rsp, %rbp
+\tmovl $8, -4(%rbp) //x = 8
+...
+\tpop %rbp
+
+\tpop %rsi
+\tsubq $16, %rsp
+\tmovl %rsi, %edi
+\tmovl %rsi, -4(%rbp)
+
+
+
  *)
 												     
