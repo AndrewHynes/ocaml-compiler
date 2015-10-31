@@ -2,12 +2,46 @@
 
 open Compiler
 open Lexing
-(*open Llvm
-open ToLLVM*)
 
+let optimised = ref false		    
+let file = ref ""
+
+(** Reads a lexbuf and turns it into a parse tree *)
 let toParseTree (l : Lexing.lexbuf) = (Parser.parseTreeTop Lexer.read l)
-					
+	       
+(** Parses a given Lexer.lexbuf *)
+let parse lexbuf = AsmGen.programToAsm @@
+		     (if !optimised
+		      then (List.map Optimiser.foldConstants @@ toParseTree lexbuf)
+		      else toParseTree lexbuf)
+	       
 (** Parses a file from a given file name *)
+let parseFile fileName =
+  let channel = open_in fileName in
+  let lexed = Lexing.from_channel channel in
+  parse lexed |> print_string;
+  close_in channel
+
+
+(** Parses the command line *)
+let parseLine u = (let line = read_line () in
+		   let lexLine = Lexing.from_string line in
+		   print_string @@ parse lexLine)
+
+(** The 'main' function, checks if a file name is given, if it is, parses that, otherwise acts as an interpreter *)
+let _ =
+  begin
+    let speclist = [("-O", Arg.Set optimised, "Turns optimisation on");
+		    ("-f", Arg.Set_string file, "Parses a file (e.g. -f myFile)")]
+    in Arg.parse speclist print_endline "";
+       if !file <> ""
+       then parseFile !file
+       else parseLine ()
+  end
+
+
+
+	 (*
 let parseFile fileName =
   let channel = open_in fileName in
   Lexing.from_channel channel
@@ -16,8 +50,7 @@ let parseFile fileName =
   |> print_string;
   close_in channel
 
-(** The 'main' function, checks if a file name is given, if it is, parses that, otherwise acts as an interpreter *)
-let _ =
+let _ = 
   if Array.length Sys.argv > 1
   then parseFile Sys.argv.(1)
   else (read_line ()
@@ -26,7 +59,7 @@ let _ =
 	|> AsmGen.programToAsm
 	|> print_string)
 
-	 (*
+
 let parseFile fileName =
   let channel = open_in fileName in
   Lexing.from_channel channel

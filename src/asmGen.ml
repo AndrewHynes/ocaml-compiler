@@ -24,7 +24,13 @@ let rec rmVar x = function
   | (a, b)::tl when x = a -> tl
   | hd::tl -> hd::(rmVar x tl)
 
+let exists x xs = (List.length @@ List.filter (fun y -> y = x) xs) >= 1
+
 let addVar v = let len = List.length !varPositions2 + 1 in
+	       varPositions2 := rmVar v !varPositions2;
+	       (*(if (exists v varPositions2)
+	       then rmVar v
+	       else ());*)
 	       varPositions2 := (v, (len * 8)) :: !varPositions2;
                (len * 8)
 
