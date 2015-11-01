@@ -4,7 +4,7 @@ This language's creation is for my third year Compiler Construction module for t
 
 * Inspiration
 
-The language aims to be functional, easy to use, and heavily inspired by ML. Its type system is Hindley-Milner based, and the programmer should not have to specify types explicitly, they should be inferred.
+CALF aims to be functional, easy to use, and heavily inspired by ML. CALF is all about being easy for the programmer. The syntax aims to be intuitive and easy to understand.
 
 * Syntax
 
@@ -56,7 +56,6 @@ let x = 3;
 let y = 8;
 print x + y;
 #+END_SRC
-
 
 ** Arithmetic and mathematics
 
@@ -155,12 +154,23 @@ let double = lamda x -> x * 2;
 
 ** Functions
 
-A function can be defined using the keyword func...
+A function can be defined using the keyword func. The function's body is enclosed in braces. Examples include:
 
 #+BEGIN_SRC language
-func double x = x * 2;
+func double x = 
+{ 
+  x * 2 
+}
 #+END_SRC
 
+#+BEGIN_SRC language
+func printAndAdd30 x = 
+{ 
+  let x = 30;
+  print x;
+  x + 30
+}
+#+END_SRC
 
 * Optimisation
 

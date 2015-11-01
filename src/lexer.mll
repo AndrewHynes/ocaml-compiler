@@ -67,6 +67,8 @@ rule read =
    | ">=" { GTEQ }
    | '(' { LBRACK }
    | ')' { RBRACK }
+   | '{' { LBRACE }
+   | '}' { RBRACE }
    | '#' { ignoreLine lexbuf }
    | letName { LET }
    | var { VAR (Lexing.lexeme lexbuf) }

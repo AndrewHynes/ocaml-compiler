@@ -28,7 +28,7 @@ let rec stringFromExpression = function
   | IfThenElse (b, e1, e2) -> "(If " ^ (stringFromExpression b) ^ ", Then (" ^ (stringFromExpression e1) ^ "), Else (" ^ (stringFromExpression e2) ^ "))"
 								      
   | Lambda (l, e) -> "(Lambda (VARIABLES: " ^ (printVars l) ^ "), " ^ (stringFromExpression e) ^ ")"
-  | Function (s, l, e) -> "(Function (name: " ^ s ^ ")" ^ ", (args: " ^ (printVars l) ^ ") (function body: " ^ (stringFromExpression e) ^ "))"
+  | Function (s, l, p) -> "(Function (name: " ^ s ^ ")" ^ ", (args: " ^ (printVars l) ^ ") (function body: " ^ (List.fold_right (fun e -> (^) @@ stringFromExpression e) p "") ^ "))"
   | FunCall _ -> "(FUNCTION CALL)"
 				
   | Plus (n, m) -> "(Plus " ^ (stringFromExpression n) ^ ", " ^  (stringFromExpression m) ^ ")"

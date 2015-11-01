@@ -39,7 +39,10 @@ let rtTests = [
     ("2\n", (stringToAsm, "let b = 3 > 5; if b then 1 else 2"));
     ("1\n", (stringToAsm, "let b = 5 > 3; if b then 1 else 2"));
     ("2\n", (stringToOptimisedAsm, "let b = 3 > 5; if b then 1 else 2"));
-    ("1\n", (stringToOptimisedAsm, "let b = 5 > 3; if b then 1 else 2"))
+    ("1\n", (stringToOptimisedAsm, "let b = 5 > 3; if b then 1 else 2"));
+
+      
+    ("500\n", (stringToOptimisedAsm, "let x = 20; 300 + 200"))
     
   ]
 		

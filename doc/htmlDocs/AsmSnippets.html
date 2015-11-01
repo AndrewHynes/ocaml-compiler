@@ -51,4 +51,11 @@ A file that contains snippets of x86_64 to be used by asmGen.ml<br>
 <pre><span id="VALasm_or"><span class="keyword">val</span> asm_or</span> : <code class="type">string</code></pre>
 <pre><span id="VALasm_ite"><span class="keyword">val</span> asm_ite</span> : <code class="type">string -> string</code></pre>
 <pre><span id="VALasm_getVar"><span class="keyword">val</span> asm_getVar</span> : <code class="type">int -> string</code></pre>
-<pre><span id="VALasm_asnVar"><span class="keyword">val</span> asm_asnVar</span> : <code class="type">int -> string</code></pre></body></html>
+<pre><span id="VALasm_asnVar"><span class="keyword">val</span> asm_asnVar</span> : <code class="type">int -> string</code></pre><div class="info ">
+Generates the assembly for the assignment of variables<br>
+</div>
+
+<pre><span id="VALasm_asnVarAndMakeRoom"><span class="keyword">val</span> asm_asnVarAndMakeRoom</span> : <code class="type">int -> string</code></pre><div class="info ">
+Generates the assembly for the assignment of variables, and makes room for two variables on the stack<br>
+</div>
+</body></html>

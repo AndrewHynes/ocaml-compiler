@@ -46,6 +46,8 @@ let rec evalMaths (exp : expression) = match exp with
   | Mod (n, m) -> mod_float (evalMaths n) (evalMaths m)
   | _ -> exit 1 (* Something bad happened *)
 
+	      
+
 (** Evaluates a constant expression containing only logic *)
 let rec evalLogic (exp : expression) = match exp with
   | Value l -> (match l with
@@ -131,13 +133,30 @@ let rec foldConstants (exp : expression) = match exp with
   | AssignExp (s, e) -> AssignExp (s, foldConstants e)
   | Application (e, e2) -> Application (foldConstants e, foldConstants e2)
   | Lambda (xs, e) -> Lambda (xs, foldConstants e)
-  | Function (s, xs, e) -> Function (s, xs, foldConstants e)
+  | Function (s, xs, p) -> Function (s, xs, List.map foldConstants p)
   | FunCall (s, es) -> FunCall (s, List.map foldConstants es)
 
   (* Anything else is returned as-is *)
   | x -> x
 
+(** Helper function to see if something exists in a list *)
 let exists x xs = (List.length @@ List.filter (fun y -> y = x) xs) >= 1
+
+(** Helper function that safely gets the tail of a list *)
+let tail = function
+    | [] -> []
+    | hd::tl -> tl
+
+(** Helper function that drops n elements from the front of a list *)
+let rec drop n xs = match n with
+  | 0 -> xs
+  | n -> drop (n - 1) (tail xs)
+
+(** Helper function that takes the first n elements from the front of a list *)
+let rec firstN n xs = match xs with
+  | [] -> []
+  | _ when n > 0 -> []
+  | hd::tl -> hd::(firstN (n - 1) xs)
 
 (** Checks to see if an expression contains a given variable *)
 let rec expContainsVar v = function
@@ -164,13 +183,19 @@ let rec expContainsVar v = function
   | Application (e, e2) -> expContainsVar v e || expContainsVar v e2
   | AssignExp (s, e) -> expContainsVar v e
   | Lambda (xs, e) -> expContainsVar v e && (not (exists v xs))
-  | Function (s, xs, e) -> expContainsVar v e && (not (exists v xs))
+  | Function (s, xs, p) -> (List.fold_right (fun x -> (||) (expContainsVar v x)) p false) && (not (exists v xs))
   | FunCall (s, es) -> List.fold_right (fun e -> (||) (expContainsVar v e)) es false
 					
   | _ -> false
 
+(** Checks if a list of expressions contains a variable *)
 let lexpContainsVar v ls = List.fold_right (fun e -> (||) (expContainsVar v e)) ls false
-  
+
+(** Propagates a constant variable through an expression
+
+To propagate x = 3, one would call
+
+propagateExp "x" (Value (Int 3)) e *) 
 let rec propagateExp (v : string) (ve : expression) = function
   | Value l -> (match l with
 	       | Var s when v = s -> ve
@@ -194,19 +219,39 @@ let rec propagateExp (v : string) (ve : expression) = function
   | PrintExp e -> PrintExp (propagateExp v ve e)
   | Application (e, e2) -> Application (propagateExp v ve e, propagateExp v ve e2)
   | AssignExp (s, e) -> AssignExp (s, propagateExp v ve e)
-  (*| Lambda (xs, e) -> expContainsVar v e && (not (exists v xs))
-  | Function (s, xs, e) -> expContainsVar v e && (not (exists v xs))
-  | FunCall (s, es) -> List.fold_right (fun e -> (||) (expContainsVar v e)) es false*)
+				  
+  | Lambda (xs, e) -> if (not (exists v xs))
+		      then Lambda (xs, propagateExp v ve e)
+		      else Lambda (xs, e)
+
+  | Function (s, xs, p) -> if (not (exists v xs))
+			   then (* Note: The following has been done to cover cases such as
+                                   let x = 3;
+                                   func f y = { let x = 4; x + y } *)
+			     (* Gets the first assignment statement assigning to the
+			        same name as the variable we're trying to propagate *)
+			     let rec findFirstAssign acc v = function
+			       | [] -> -1
+			       | (AssignExp (s, _))::tl when s = v -> acc 
+			       | hd::tl -> findFirstAssign (acc + 1) v tl in
+                             let pos = findFirstAssign 0 v p in
+			     if pos = -1
+			     then Function (s, xs, List.map (propagateExp v ve) p)
+			     else Function (s, xs, (propagateConst v ve (firstN pos p)) @
+						      (propagateConstants @@ drop pos p))
+			   else Function (s, xs, p)
+
+  | FunCall (s, es) -> FunCall (s, List.map (propagateExp v ve) es)
 
   | x -> x
 
-	   
-let rec propagateConst v e (p : program) = match p with
+(** Propagates a given constant throughout the program *)
+and propagateConst v e (p : program) = match p with
   | [] -> []
   | hd::tl -> foldConstants (propagateExp v e hd) :: propagateConst v e tl
 
 (** Removes unused variables and propagates constants *)
-let rec propagateConstants (p : program) = match p with
+and propagateConstants (p : program) = match p with
   | [] -> []
   | hd::tl -> (match hd with
 	       | AssignExp (s, e) -> if (not (lexpContainsVar s tl))

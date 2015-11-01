@@ -39,7 +39,7 @@ type expression = Plus of expression * expression
 		| FunCall of string * (expression list)
  and lambdaExp = string list * expression
  (** A type for lambda expressions *)
- and funct = string * (string list) * expression
+ and funct = string * (string list) * (expression list)
  (** A type for functions *)
 
 (** The program type, the type that will be returned by the parser *)

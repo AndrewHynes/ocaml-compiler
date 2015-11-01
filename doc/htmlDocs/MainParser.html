@@ -30,8 +30,21 @@ The main file, which is the one that is actually compiled from<br>
 </div>
 <hr width="100%">
 
-<pre><span id="VALtoParseTree"><span class="keyword">val</span> toParseTree</span> : <code class="type">Lexing.lexbuf -> <a href="Syntax.html#TYPEprogram">Syntax.program</a></code></pre>
+<pre><span id="VALoptimised"><span class="keyword">val</span> optimised</span> : <code class="type">bool Pervasives.ref</code></pre>
+<pre><span id="VALfile"><span class="keyword">val</span> file</span> : <code class="type">string Pervasives.ref</code></pre>
+<pre><span id="VALtoParseTree"><span class="keyword">val</span> toParseTree</span> : <code class="type">Lexing.lexbuf -> <a href="Syntax.html#TYPEprogram">Syntax.program</a></code></pre><div class="info ">
+Reads a lexbuf and turns it into a parse tree<br>
+</div>
+
+<pre><span id="VALparse"><span class="keyword">val</span> parse</span> : <code class="type">Lexing.lexbuf -> string</code></pre><div class="info ">
+Parses a given Lexer.lexbuf<br>
+</div>
+
 <pre><span id="VALparseFile"><span class="keyword">val</span> parseFile</span> : <code class="type">string -> unit</code></pre><div class="info ">
 Parses a file from a given file name<br>
+</div>
+
+<pre><span id="VALparseLine"><span class="keyword">val</span> parseLine</span> : <code class="type">'a -> unit</code></pre><div class="info ">
+Parses the command line<br>
 </div>
 </body></html>

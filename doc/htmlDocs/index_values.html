@@ -21,13 +21,24 @@
 <table>
 <tr><td align="left"><br>A</td></tr>
 <tr><td><a href="AsmGen.html#VALaddVar">addVar</a> [<a href="AsmGen.html">AsmGen</a>]</td>
-<td></td></tr>
+<td><div class="info">
+Adds a variable to the list of local variables
+</div>
+</td></tr>
 <tr><td><a href="AsmSnippets.html#VALasm_add">asm_add</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
 <td></td></tr>
 <tr><td><a href="AsmSnippets.html#VALasm_and">asm_and</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
 <td></td></tr>
 <tr><td><a href="AsmSnippets.html#VALasm_asnVar">asm_asnVar</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
-<td></td></tr>
+<td><div class="info">
+Generates the assembly for the assignment of variables
+</div>
+</td></tr>
+<tr><td><a href="AsmSnippets.html#VALasm_asnVarAndMakeRoom">asm_asnVarAndMakeRoom</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
+<td><div class="info">
+Generates the assembly for the assignment of variables, and makes room for two variables on the stack
+</div>
+</td></tr>
 <tr><td><a href="AsmSnippets.html#VALasm_dataSegment">asm_dataSegment</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
 <td></td></tr>
 <tr><td><a href="AsmSnippets.html#VALasm_div">asm_div</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
@@ -65,6 +76,12 @@
 <tr><td align="left"><br>C</td></tr>
 <tr><td><a href="AsmSnippets.html#VALcmpAndPushSFOF">cmpAndPushSFOF</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
 <td></td></tr>
+<tr><td align="left"><br>D</td></tr>
+<tr><td><a href="Optimiser.html#VALdrop">drop</a> [<a href="Optimiser.html">Optimiser</a>]</td>
+<td><div class="info">
+Helper function that drops n elements from the front of a list
+</div>
+</td></tr>
 <tr><td align="left"><br>E</td></tr>
 <tr><td><a href="Optimiser.html#VALevalLogic">evalLogic</a> [<a href="Optimiser.html">Optimiser</a>]</td>
 <td><div class="info">
@@ -76,12 +93,29 @@ Evaluates a constant expression containing only logic
 Evaluates a constant expression containing only maths
 </div>
 </td></tr>
+<tr><td><a href="Optimiser.html#VALexists">exists</a> [<a href="Optimiser.html">Optimiser</a>]</td>
+<td><div class="info">
+Helper function to see if something exists in a list
+</div>
+</td></tr>
+<tr><td><a href="AsmGen.html#VALexists">exists</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<td><div class="info">
+Helper function to see if something exists in a list
+</div>
+</td></tr>
+<tr><td><a href="Optimiser.html#VALexpContainsVar">expContainsVar</a> [<a href="Optimiser.html">Optimiser</a>]</td>
+<td><div class="info">
+Checks to see if an expression contains a given variable
+</div>
+</td></tr>
 <tr><td><a href="AsmGen.html#VALexpToAsm">expToAsm</a> [<a href="AsmGen.html">AsmGen</a>]</td>
 <td><div class="info">
 Converts one expression to assembly
 </div>
 </td></tr>
 <tr><td align="left"><br>F</td></tr>
+<tr><td><a href="MainParser.html#VALfile">file</a> [<a href="MainParser.html">MainParser</a>]</td>
+<td></td></tr>
 <tr><td><a href="AsmGen.html#VALfindVarName">findVarName</a> [<a href="AsmGen.html">AsmGen</a>]</td>
 <td><div class="info">
 Finds the name of a variable as written in the output assembly
@@ -92,12 +126,22 @@ Finds the name of a variable as written in the output assembly
 Finds the position in the stack of a variable as written in the output assembly
 </div>
 </td></tr>
+<tr><td><a href="Optimiser.html#VALfirstN">firstN</a> [<a href="Optimiser.html">Optimiser</a>]</td>
+<td><div class="info">
+Helper function that takes the first n elements from the front of a list
+</div>
+</td></tr>
 <tr><td><a href="Optimiser.html#VALfoldConstants">foldConstants</a> [<a href="Optimiser.html">Optimiser</a>]</td>
 <td><div class="info">
-'Folds' the constants in a single expression, and performs optimisations such:
+'Folds' the constants in a single expression, and performs optimisations such as:
 </div>
 </td></tr>
 <tr><td align="left"><br>I</td></tr>
+<tr><td><a href="Optimiser.html#VALisConstOnly">isConstOnly</a> [<a href="Optimiser.html">Optimiser</a>]</td>
+<td><div class="info">
+True if the expression is constant, false otherwise
+</div>
+</td></tr>
 <tr><td><a href="Optimiser.html#VALisLogicOnly">isLogicOnly</a> [<a href="Optimiser.html">Optimiser</a>]</td>
 <td><div class="info">
 Checks to see if an expression contains only logic
@@ -110,17 +154,43 @@ Checks to see if an expression contains only maths
 </td></tr>
 <tr><td align="left"><br>L</td></tr>
 <tr><td><a href="AsmGen.html#VALlabels">labels</a> [<a href="AsmGen.html">AsmGen</a>]</td>
-<td></td></tr>
+<td><div class="info">
+Keeps a list of all of the labels used (e.g.
+</div>
+</td></tr>
+<tr><td><a href="Optimiser.html#VALlexpContainsVar">lexpContainsVar</a> [<a href="Optimiser.html">Optimiser</a>]</td>
+<td><div class="info">
+Checks if a list of expressions contains a variable
+</div>
+</td></tr>
 <tr><td align="left"><br>M</td></tr>
 <tr><td><a href="AsmGen.html#VALmakeDataSegment">makeDataSegment</a> [<a href="AsmGen.html">AsmGen</a>]</td>
 <td><div class="info">
 Adds to the data segment of the output for each variable we need space for
 </div>
 </td></tr>
+<tr><td align="left"><br>O</td></tr>
+<tr><td><a href="Optimiser.html#VALoptimise">optimise</a> [<a href="Optimiser.html">Optimiser</a>]</td>
+<td><div class="info">
+Fully optimises a program with every optimisation it can do.
+</div>
+</td></tr>
+<tr><td><a href="MainParser.html#VALoptimised">optimised</a> [<a href="MainParser.html">MainParser</a>]</td>
+<td></td></tr>
 <tr><td align="left"><br>P</td></tr>
+<tr><td><a href="MainParser.html#VALparse">parse</a> [<a href="MainParser.html">MainParser</a>]</td>
+<td><div class="info">
+Parses a given Lexer.lexbuf
+</div>
+</td></tr>
 <tr><td><a href="MainParser.html#VALparseFile">parseFile</a> [<a href="MainParser.html">MainParser</a>]</td>
 <td><div class="info">
 Parses a file from a given file name
+</div>
+</td></tr>
+<tr><td><a href="MainParser.html#VALparseLine">parseLine</a> [<a href="MainParser.html">MainParser</a>]</td>
+<td><div class="info">
+Parses the command line
 </div>
 </td></tr>
 <tr><td><a href="Compiler.html#VALparseWithError">parseWithError</a> [<a href="Compiler.html">Compiler</a>]</td>
@@ -135,6 +205,26 @@ Parses the file, but may print an error if it cannot be parsed (such as due to i
 <tr><td><a href="AsmGen.html#VALprogramToAsm">programToAsm</a> [<a href="AsmGen.html">AsmGen</a>]</td>
 <td><div class="info">
 Converts a program to assembly
+</div>
+</td></tr>
+<tr><td><a href="Optimiser.html#VALpropagateConst">propagateConst</a> [<a href="Optimiser.html">Optimiser</a>]</td>
+<td><div class="info">
+Propagates a given constant throughout the program
+</div>
+</td></tr>
+<tr><td><a href="Optimiser.html#VALpropagateConstants">propagateConstants</a> [<a href="Optimiser.html">Optimiser</a>]</td>
+<td><div class="info">
+Removes unused variables and propagates constants
+</div>
+</td></tr>
+<tr><td><a href="Optimiser.html#VALpropagateExp">propagateExp</a> [<a href="Optimiser.html">Optimiser</a>]</td>
+<td><div class="info">
+Propagates a constant variable through an expression
+</div>
+</td></tr>
+<tr><td><a href="AsmGen.html#VALpurgeAllLists">purgeAllLists</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<td><div class="info">
+Resets all of the lists (mainly for purpose of testing)
 </div>
 </td></tr>
 <tr><td align="left"><br>R</td></tr>
@@ -154,11 +244,27 @@ Produces a string representing an abstract syntax tree
 <tr><td><a href="Compiler.html#VALstringFromLangType">stringFromLangType</a> [<a href="Compiler.html">Compiler</a>]</td>
 <td></td></tr>
 <tr><td align="left"><br>T</td></tr>
+<tr><td><a href="Optimiser.html#VALtail">tail</a> [<a href="Optimiser.html">Optimiser</a>]</td>
+<td><div class="info">
+Helper function that safely gets the tail of a list
+</div>
+</td></tr>
 <tr><td><a href="MainParser.html#VALtoParseTree">toParseTree</a> [<a href="MainParser.html">MainParser</a>]</td>
-<td></td></tr>
+<td><div class="info">
+Reads a lexbuf and turns it into a parse tree
+</div>
+</td></tr>
 <tr><td align="left"><br>V</td></tr>
 <tr><td><a href="AsmGen.html#VALvarPositions">varPositions</a> [<a href="AsmGen.html">AsmGen</a>]</td>
-<td></td></tr>
+<td><div class="info">
+Keeps position of global variables (may be obsolete soon)
+</div>
+</td></tr>
+<tr><td><a href="AsmGen.html#VALvarPositions2">varPositions2</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<td><div class="info">
+Keeps the position of local variables
+</div>
+</td></tr>
 <tr><td align="left"><br>Z</td></tr>
 <tr><td><a href="AsmSnippets.html#VALzfE1">zfE1</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
 <td></td></tr>

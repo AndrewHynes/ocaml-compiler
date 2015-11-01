@@ -29,6 +29,8 @@
 %token GTEQ
 %token LBRACK
 %token RBRACK
+%token LBRACE
+%token RBRACE
 %token MINUS
 %token PLUS
 %token TIMES
@@ -108,7 +110,8 @@ lambda:
 (* Name, list of args, then expression 
    May need refinement (type information?) *)
 func:
-  | FUNC; name = VAR; l = nonempty_list(v = VAR { v }); EQUALS; e = expression { (name, l, e) }
+  | FUNC; name = VAR; l = nonempty_list(v = VAR { v }); EQUALS;
+    LBRACE; p = nonempty_list(s = statement { s }); RBRACE { (name, l, p) }
 
 printT:
   | LBRACK; p = printT; RBRACK { p }

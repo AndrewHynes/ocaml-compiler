@@ -46,8 +46,12 @@ Evaluates a constant expression containing only maths<br>
 Evaluates a constant expression containing only logic<br>
 </div>
 
+<pre><span id="VALisConstOnly"><span class="keyword">val</span> isConstOnly</span> : <code class="type"><a href="Syntax.html#TYPEexpression">Syntax.expression</a> -> bool</code></pre><div class="info ">
+True if the expression is constant, false otherwise<br>
+</div>
+
 <pre><span id="VALfoldConstants"><span class="keyword">val</span> foldConstants</span> : <code class="type"><a href="Syntax.html#TYPEexpression">Syntax.expression</a> -> <a href="Syntax.html#TYPEexpression">Syntax.expression</a></code></pre><div class="info ">
-'Folds' the constants in a single expression, and performs optimisations such:
+'Folds' the constants in a single expression, and performs optimisations such as:
 <p>
 <ul>
 <li>Replaces maths with constants (e.g. replaces 3 + 3 with 6)</li>
@@ -60,6 +64,63 @@ Evaluates a constant expression containing only logic<br>
 </ul>
 <ul>
 <li>Does this recursively and fully optimises the AST (for example, it would simplify the expression (lambda _ -&gt; lambda _ -&gt; 6) to (lambda _ -&gt; lambda _ -&gt; 6)</li>
+</ul>
+<br>
+</div>
+
+<pre><span id="VALexists"><span class="keyword">val</span> exists</span> : <code class="type">'a -> 'a list -> bool</code></pre><div class="info ">
+Helper function to see if something exists in a list<br>
+</div>
+
+<pre><span id="VALtail"><span class="keyword">val</span> tail</span> : <code class="type">'a list -> 'a list</code></pre><div class="info ">
+Helper function that safely gets the tail of a list<br>
+</div>
+
+<pre><span id="VALdrop"><span class="keyword">val</span> drop</span> : <code class="type">int -> 'a list -> 'a list</code></pre><div class="info ">
+Helper function that drops n elements from the front of a list<br>
+</div>
+
+<pre><span id="VALfirstN"><span class="keyword">val</span> firstN</span> : <code class="type">int -> 'a list -> 'a list</code></pre><div class="info ">
+Helper function that takes the first n elements from the front of a list<br>
+</div>
+
+<pre><span id="VALexpContainsVar"><span class="keyword">val</span> expContainsVar</span> : <code class="type">string -> <a href="Syntax.html#TYPEexpression">Syntax.expression</a> -> bool</code></pre><div class="info ">
+Checks to see if an expression contains a given variable<br>
+</div>
+
+<pre><span id="VALlexpContainsVar"><span class="keyword">val</span> lexpContainsVar</span> : <code class="type">string -> <a href="Syntax.html#TYPEexpression">Syntax.expression</a> list -> bool</code></pre><div class="info ">
+Checks if a list of expressions contains a variable<br>
+</div>
+
+<pre><span id="VALpropagateExp"><span class="keyword">val</span> propagateExp</span> : <code class="type">string -> <a href="Syntax.html#TYPEexpression">Syntax.expression</a> -> <a href="Syntax.html#TYPEexpression">Syntax.expression</a> -> <a href="Syntax.html#TYPEexpression">Syntax.expression</a></code></pre><div class="info ">
+Propagates a constant variable through an expression
+<p>
+
+To propagate x = 3, one would call
+<p>
+
+propagateExp "x" (Value (Int 3)) e<br>
+</div>
+
+<pre><span id="VALpropagateConst"><span class="keyword">val</span> propagateConst</span> : <code class="type">string -> <a href="Syntax.html#TYPEexpression">Syntax.expression</a> -> <a href="Syntax.html#TYPEprogram">Syntax.program</a> -> <a href="Syntax.html#TYPEprogram">Syntax.program</a></code></pre><div class="info ">
+Propagates a given constant throughout the program<br>
+</div>
+
+<pre><span id="VALpropagateConstants"><span class="keyword">val</span> propagateConstants</span> : <code class="type"><a href="Syntax.html#TYPEprogram">Syntax.program</a> -> <a href="Syntax.html#TYPEexpression">Syntax.expression</a> list</code></pre><div class="info ">
+Removes unused variables and propagates constants<br>
+</div>
+
+<pre><span id="VALoptimise"><span class="keyword">val</span> optimise</span> : <code class="type"><a href="Syntax.html#TYPEexpression">Syntax.expression</a> list -> <a href="Syntax.html#TYPEexpression">Syntax.expression</a> list</code></pre><div class="info ">
+Fully optimises a program with every optimisation it can do. Includes:
+<p>
+<ul>
+<li>Constant folding</li>
+</ul>
+<ul>
+<li>Constant propagation</li>
+</ul>
+<ul>
+<li>Removing unused variables</li>
 </ul>
 <br>
 </div>

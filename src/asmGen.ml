@@ -6,12 +6,16 @@ open AsmSnippets
 exception CompilationError of string
 
 (* Note: will probably want to be an integer in the future. *)
+(** Keeps a list of all of the labels used (e.g. for jmp instructions) *)
 let labels = ref []
 
+(** Keeps position of global variables (may be obsolete soon) *)
 let varPositions = ref []
-		       
-let (varPositions2 : ((string * int) list) ref) = ref []
 
+(** Keeps the position of local variables *)
+let varPositions2 = ref []
+
+(** Resets all of the lists (mainly for purpose of testing) *)
 let purgeAllLists (u : unit) = labels := [];
 			       varPositions := [];
 			       varPositions2 := [];
@@ -29,8 +33,10 @@ let rec rmVar x = function
   | (a, b)::tl when x = a -> tl
   | hd::tl -> hd::(rmVar x tl)
 
+(** Helper function to see if something exists in a list *)
 let exists x xs = (List.length @@ List.filter (fun y -> y = x) xs) >= 1
 
+(** Adds a variable to the list of local variables *)
 let addVar v = let len = List.length !varPositions2 + 1 in
 	       varPositions2 := rmVar v !varPositions2;
 	       (*(if (exists v varPositions2)
@@ -112,16 +118,8 @@ let rec expToAsm (e : expression) = match e with
 let programToAsm (p : program) =
   let rec helper (p : program) acc = match p with
   | [] -> acc
-  | hd::tl -> (*(match hd with
-	       |AssignExp _ -> print_string "Assign\n"
-	       | _ -> print_string "Not assign\n");*) helper tl (acc ^ (expToAsm hd))
+  | hd::tl -> helper tl (acc ^ (expToAsm hd))
   in
   asm_prefix ^ (helper p "") ^ asm_suffix
 										
-(*
-let programToAsm (p : program) =
-  let dataSeg = asm_dataSegment ^ (List.fold_right (fun e -> (^) (makeDataSegment e))) in
-  match p with
-  | e::[] -> dataSeg ^ asm_prefix ^ (expToAsm e) ^ asm_suffix
-  | _ -> print_string "Syntax error\n"; exit 1 *)
 		

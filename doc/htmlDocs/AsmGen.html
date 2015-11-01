@@ -30,8 +30,22 @@ Generates assembly code from a syntax tree<br>
 
 <pre><span id="EXCEPTIONCompilationError"><span class="keyword">exception</span> CompilationError</span> <span class="keyword">of</span> <code class="type">string</code></pre>
 
-<pre><span id="VALlabels"><span class="keyword">val</span> labels</span> : <code class="type">string list Pervasives.ref</code></pre>
-<pre><span id="VALvarPositions"><span class="keyword">val</span> varPositions</span> : <code class="type">(string * string) list Pervasives.ref</code></pre>
+<pre><span id="VALlabels"><span class="keyword">val</span> labels</span> : <code class="type">string list Pervasives.ref</code></pre><div class="info ">
+Keeps a list of all of the labels used (e.g. for jmp instructions)<br>
+</div>
+
+<pre><span id="VALvarPositions"><span class="keyword">val</span> varPositions</span> : <code class="type">(string * string) list Pervasives.ref</code></pre><div class="info ">
+Keeps position of global variables (may be obsolete soon)<br>
+</div>
+
+<pre><span id="VALvarPositions2"><span class="keyword">val</span> varPositions2</span> : <code class="type">(string * int) list Pervasives.ref</code></pre><div class="info ">
+Keeps the position of local variables<br>
+</div>
+
+<pre><span id="VALpurgeAllLists"><span class="keyword">val</span> purgeAllLists</span> : <code class="type">unit -> unit</code></pre><div class="info ">
+Resets all of the lists (mainly for purpose of testing)<br>
+</div>
+
 <pre><span id="VALfindVarPos"><span class="keyword">val</span> findVarPos</span> : <code class="type">string -> (string * 'a) list -> 'a</code></pre><div class="info ">
 Finds the position in the stack of a variable as written in the output assembly<br>
 </div>
@@ -40,7 +54,14 @@ Finds the position in the stack of a variable as written in the output assembly<
 Removes a variable from the list<br>
 </div>
 
-<pre><span id="VALaddVar"><span class="keyword">val</span> addVar</span> : <code class="type">string -> int</code></pre>
+<pre><span id="VALexists"><span class="keyword">val</span> exists</span> : <code class="type">'a -> 'a list -> bool</code></pre><div class="info ">
+Helper function to see if something exists in a list<br>
+</div>
+
+<pre><span id="VALaddVar"><span class="keyword">val</span> addVar</span> : <code class="type">string -> int</code></pre><div class="info ">
+Adds a variable to the list of local variables<br>
+</div>
+
 <pre><span id="VALfindVarName"><span class="keyword">val</span> findVarName</span> : <code class="type">string -> (string * 'a) list -> 'a</code></pre><div class="info ">
 Finds the name of a variable as written in the output assembly<br>
 </div>
