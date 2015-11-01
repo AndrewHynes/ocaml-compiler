@@ -64,8 +64,13 @@ let rec evalLogic (exp : expression) = match exp with
 					     
   | _ -> exit 1 (* Something bad happened *)
 
+(** True if the expression is constant, false otherwise *)
+let isConstOnly e = isLogicOnly e || isMathsOnly e
 
-(** 'Folds' the constants in a single expression, and performs optimisations such:
+
+	      
+
+(** 'Folds' the constants in a single expression, and performs optimisations such as:
 
 - Replaces maths with constants (e.g. replaces 3 + 3 with 6)
 
@@ -131,3 +136,94 @@ let rec foldConstants (exp : expression) = match exp with
 
   (* Anything else is returned as-is *)
   | x -> x
+
+let exists x xs = (List.length @@ List.filter (fun y -> y = x) xs) >= 1
+
+(** Checks to see if an expression contains a given variable *)
+let rec expContainsVar v = function
+  | Value l -> (match l with
+	       | Var s -> s = v
+	       | _ -> false)
+
+  | Plus (n, m) -> expContainsVar v n || expContainsVar v m
+  | Times (n, m) -> expContainsVar v n || expContainsVar v m
+  | Minus (n, m) -> expContainsVar v n || expContainsVar v m
+  | Div (n, m) -> expContainsVar v n || expContainsVar v m
+  | Mod (n, m) -> expContainsVar v n || expContainsVar v m
+  | Not b -> expContainsVar v b
+  | And (b, c) -> expContainsVar v b || expContainsVar v c
+  | Or (b, c) -> expContainsVar v b || expContainsVar v c
+  | EQ (b, c) -> expContainsVar v b || expContainsVar v c
+  | LT (b, c) -> expContainsVar v b || expContainsVar v c
+  | GT (b, c) -> expContainsVar v b || expContainsVar v c
+  | LTEQ (b, c) -> expContainsVar v b || expContainsVar v c
+  | GTEQ (b, c) -> expContainsVar v b || expContainsVar v c
+  | IfThenElse (b, e1, e2) -> expContainsVar v b || expContainsVar v e1 || expContainsVar v e2
+
+  | PrintExp e -> expContainsVar v e
+  | Application (e, e2) -> expContainsVar v e || expContainsVar v e2
+  | AssignExp (s, e) -> expContainsVar v e
+  | Lambda (xs, e) -> expContainsVar v e && (not (exists v xs))
+  | Function (s, xs, e) -> expContainsVar v e && (not (exists v xs))
+  | FunCall (s, es) -> List.fold_right (fun e -> (||) (expContainsVar v e)) es false
+					
+  | _ -> false
+
+let lexpContainsVar v ls = List.fold_right (fun e -> (||) (expContainsVar v e)) ls false
+  
+let rec propagateExp (v : string) (ve : expression) = function
+  | Value l -> (match l with
+	       | Var s when v = s -> ve
+	       | x -> Value l)
+    
+  | Plus (n, m) -> Plus (propagateExp v ve n, propagateExp v ve m)
+  | Times (n, m) -> Times (propagateExp v ve n, propagateExp v ve m)
+  | Minus (n, m) -> Minus (propagateExp v ve n, propagateExp v ve m)
+  | Div (n, m) -> Div (propagateExp v ve n, propagateExp v ve m)
+  | Mod (n, m) -> Mod (propagateExp v ve n, propagateExp v ve m)
+  | Not b -> Not (propagateExp v ve b)
+  | And (b, c) -> And (propagateExp v ve b, propagateExp v ve c)
+  | Or (b, c) -> Or (propagateExp v ve b, propagateExp v ve c)
+  | EQ (b, c) -> EQ (propagateExp v ve b, propagateExp v ve c)
+  | LT (b, c) -> LT (propagateExp v ve b, propagateExp v ve c)
+  | GT (b, c) -> GT (propagateExp v ve b, propagateExp v ve c)
+  | LTEQ (b, c) -> LTEQ (propagateExp v ve b, propagateExp v ve c)
+  | GTEQ (b, c) -> GTEQ (propagateExp v ve b, propagateExp v ve c)
+  | IfThenElse (b, e1, e2) -> IfThenElse (propagateExp v ve b, propagateExp v ve e1, propagateExp v ve e2)
+					 
+  | PrintExp e -> PrintExp (propagateExp v ve e)
+  | Application (e, e2) -> Application (propagateExp v ve e, propagateExp v ve e2)
+  | AssignExp (s, e) -> AssignExp (s, propagateExp v ve e)
+  (*| Lambda (xs, e) -> expContainsVar v e && (not (exists v xs))
+  | Function (s, xs, e) -> expContainsVar v e && (not (exists v xs))
+  | FunCall (s, es) -> List.fold_right (fun e -> (||) (expContainsVar v e)) es false*)
+
+  | x -> x
+
+	   
+let rec propagateConst v e (p : program) = match p with
+  | [] -> []
+  | hd::tl -> foldConstants (propagateExp v e hd) :: propagateConst v e tl
+
+(** Removes unused variables and propagates constants *)
+let rec propagateConstants (p : program) = match p with
+  | [] -> []
+  | hd::tl -> (match hd with
+	       | AssignExp (s, e) -> if (not (lexpContainsVar s tl))
+				     then propagateConstants tl
+				     else (if isConstOnly e
+					   then propagateConstants (propagateConst s e tl) 
+					   else hd::propagateConstants tl)
+	       | x -> x::propagateConstants tl)
+
+(** Fully optimises a program with every optimisation it can do. Includes:
+
+- Constant folding
+
+- Constant propagation
+
+- Removing unused variables *)
+let optimise p = propagateConstants (List.map foldConstants p)
+
+
+  

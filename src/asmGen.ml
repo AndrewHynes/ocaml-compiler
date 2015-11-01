@@ -12,6 +12,11 @@ let varPositions = ref []
 		       
 let (varPositions2 : ((string * int) list) ref) = ref []
 
+let purgeAllLists (u : unit) = labels := [];
+			       varPositions := [];
+			       varPositions2 := [];
+			       u
+
 (** Finds the position in the stack of a variable as written in the output assembly *)
 let rec findVarPos x = function
   | [] -> raise @@ CompilationError ("Variable " ^ x ^ " never initialised.")

@@ -68,7 +68,10 @@ let rtTests = [
     (errorString, (stringToOptimisedAsm, "1/"));
     
     (errorString, (stringToAsm, "1>"));
-    (errorString, (stringToOptimisedAsm, "1>"))
+    (errorString, (stringToOptimisedAsm, "1>"));
+
+    (errorString, (stringToAsm, "x"));
+    (errorString, (stringToOptimisedAsm, "x"))
 
   ]
 

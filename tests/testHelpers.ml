@@ -9,12 +9,12 @@ let stringToAST s = try stringFromAST @@ parseString s
 		    | Parser.Error -> errorString
 		    | Lexer.SyntaxError msg -> errorString
 						 
-let stringToOptimisedAST s = try stringFromAST (List.map Optimiser.foldConstants (parseString s))
+let stringToOptimisedAST s = try stringFromAST (Optimiser.optimise (parseString s))
 			     with
 			     | Parser.Error -> errorString
 			     | Lexer.SyntaxError msg -> errorString
 
-let stringToOptimisedAsm s = try AsmGen.programToAsm (List.map Optimiser.foldConstants (parseString s))
+let stringToOptimisedAsm s = try AsmGen.programToAsm (Optimiser.optimise (parseString s))
 			     with
 			     | Parser.Error -> errorString
 			     | Lexer.SyntaxError msg -> errorString
@@ -46,15 +46,19 @@ let runProg (u : unit) = ignore(Sys.command ("cc asmFile.s"));
 
 let cleanUp (u : unit) = ignore(Sys.command ("rm -f asmFile.s"));
 			 ignore(Sys.command ("rm -f outputFile"));
-			 ignore(Sys.command ("rm -f a.out"))
+			 ignore(Sys.command ("rm -f a.out"));
+			 AsmGen.purgeAllLists ()
+
+let cleanAndRun f b = cleanUp (); f b
 			       
-let runRuntimeTests t =  List.map (fun (a, (b, b2)) -> let asm = (b b2) in
-						       if asm = errorString
-						       then a = errorString
-						       else
-						       (printToOutput (b b2);
-						       runProg ();
-						       a = (stringOfFile "outputFile")))
+let runRuntimeTests t =  List.map (fun (a, (b, b2)) -> let asm = cleanAndRun b b2 in
+						       (if asm = errorString
+							then (a = errorString)
+							else
+							  (printToOutput (cleanAndRun b b2);
+							   runProg ();
+							   let output = stringOfFile "outputFile" in
+							   a = output)))
 				  t
 
 let indexesOfFalses =

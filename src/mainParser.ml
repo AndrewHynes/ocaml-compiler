@@ -28,7 +28,7 @@ let parseLine u = (let line = read_line () in
 		   let lexLine = Lexing.from_string line in
 		   print_string @@ parse lexLine)
 
-(** The 'main' function, checks if a file name is given, if it is, parses that, otherwise acts as an interpreter *)
+(** The 'main' function, checks if a file name is given with -f, if it is, parses that, otherwise acts as an interpreter. *)
 let _ =
   begin
     let speclist = [("-O", Arg.Set optimised, "Turns optimisation on");
