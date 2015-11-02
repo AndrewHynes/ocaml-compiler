@@ -2,6 +2,7 @@
 
 open Compiler
 open Lexing
+open Printf
 
 let optimised = ref false		    
 let file = ref ""
@@ -10,10 +11,23 @@ let file = ref ""
 let toParseTree (l : Lexing.lexbuf) = (Parser.parseTreeTop Lexer.read l)
 	       
 (** Parses a given Lexer.lexbuf *)
-let parse lexbuf = AsmGen.programToAsm @@
+let parse lexbuf = try AsmGen.programToAsm @@
 		     (if !optimised
-		      then (List.map Optimiser.foldConstants @@ toParseTree lexbuf)
+		      then (Optimiser.optimise @@ toParseTree lexbuf)
 		      else toParseTree lexbuf)
+		   with
+		   | Lexer.SyntaxError msg ->
+		      eprintf "LEXICAL ERROR --- %a: " prettyPrintPosition lexbuf;
+		      prerr_string msg;
+		      exit (-1)
+		   | Parser.Error ->
+		      eprintf "SYNTAX ERROR --- %a: " prettyPrintPosition lexbuf;
+		      (if (lexbuf.lex_buffer_len = lexbuf.lex_curr_pos)
+		       then prerr_string "Expected tokens, found end of input.\n"
+		       else prerr_string ("Unexpected character: " ^ (Lexing.lexeme lexbuf) ^ "\n"));
+		      exit (-1)
+		   | AsmGen.CompilationError msg -> prerr_string ("Compilation error: " ^ msg);
+						    exit (-1)
 	       
 (** Parses a file from a given file name *)
 let parseFile fileName =

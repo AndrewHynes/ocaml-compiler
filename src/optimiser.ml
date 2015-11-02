@@ -1,5 +1,6 @@
 (** An optimiser that optimises the parsed AST by using various techniques. *) 
 open Syntax
+open Helpers
 
 (** Checks to see if an expression contains only maths *)
 let rec isMathsOnly (exp : expression) = match exp with
@@ -69,9 +70,6 @@ let rec evalLogic (exp : expression) = match exp with
 (** True if the expression is constant, false otherwise *)
 let isConstOnly e = isLogicOnly e || isMathsOnly e
 
-
-	      
-
 (** 'Folds' the constants in a single expression, and performs optimisations such as:
 
 - Replaces maths with constants (e.g. replaces 3 + 3 with 6)
@@ -138,25 +136,6 @@ let rec foldConstants (exp : expression) = match exp with
 
   (* Anything else is returned as-is *)
   | x -> x
-
-(** Helper function to see if something exists in a list *)
-let exists x xs = (List.length @@ List.filter (fun y -> y = x) xs) >= 1
-
-(** Helper function that safely gets the tail of a list *)
-let tail = function
-    | [] -> []
-    | hd::tl -> tl
-
-(** Helper function that drops n elements from the front of a list *)
-let rec drop n xs = match n with
-  | 0 -> xs
-  | n -> drop (n - 1) (tail xs)
-
-(** Helper function that takes the first n elements from the front of a list *)
-let rec firstN n xs = match xs with
-  | [] -> []
-  | _ when n > 0 -> []
-  | hd::tl -> hd::(firstN (n - 1) xs)
 
 (** Checks to see if an expression contains a given variable *)
 let rec expContainsVar v = function
@@ -237,9 +216,9 @@ let rec propagateExp (v : string) (ve : expression) = function
                              let pos = findFirstAssign 0 v p in
 			     if pos = -1
 			     then Function (s, xs, List.map (propagateExp v ve) p)
-			     else Function (s, xs, (propagateConst v ve (firstN pos p)) @
+			     else Function (s, xs, (propagateConst v ve (take pos p)) @
 						      (propagateConstants @@ drop pos p))
-			   else Function (s, xs, p)
+			   else Function (s, xs, propagateConstants p)
 
   | FunCall (s, es) -> FunCall (s, List.map (propagateExp v ve) es)
 
