@@ -69,6 +69,7 @@ rule read =
    | ')' { RBRACK }
    | '{' { LBRACE }
    | '}' { RBRACE }
+   | '`' { BACKTICK }
    | '#' { ignoreLine lexbuf }
    | letName { LET }
    | var { VAR (Lexing.lexeme lexbuf) }

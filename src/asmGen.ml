@@ -11,15 +11,15 @@ exception CompilationError of string
 let labels = ref []
 
 (** Keeps position of global variables (may be obsolete soon) *)
-let varPositions = ref []
+let gVarPositions = ref []
 
 (** Keeps the position of local variables *)
-let varPositions2 = ref []
+let lVarPositions = ref []
 
 (** Resets all of the lists (mainly for purpose of testing) *)
 let purgeAllLists (u : unit) = labels := [];
-			       varPositions := [];
-			       varPositions2 := [];
+			       gVarPositions := [];
+			       lVarPositions := [];
 			       u
 
 (** Finds the position in the stack of a variable as written in the output assembly *)
@@ -35,12 +35,12 @@ let rec rmVar x = function
   | hd::tl -> hd::(rmVar x tl)
 
 (** Adds a variable to the list of local variables *)
-let addVar v = let len = List.length !varPositions2 + 1 in
-	       (*varPositions2 := rmVar v !varPositions2;*)
-	       (*(if (exists v varPositions2)
+let addVar v = let len = List.length !lVarPositions + 1 in
+	       (*lVarPositions := rmVar v !lVarPositions;*)
+	       (*(if (exists v lVarPositions)
 	       then rmVar v
 	       else ());*)
-	       varPositions2 := (v, (len * 8)) :: !varPositions2;
+	       lVarPositions := (v, (len * 8)) :: !lVarPositions;
                (len * 8)
 
 (** Finds the name of a variable as written in the output assembly *)
@@ -51,22 +51,22 @@ let rec findVarName x = function
 
 (** Adds to the data segment of the output for each variable we need space for *)
 let makeDataSegment (e : expression) = match e with
-  | AssignExp (s, _) -> let name = "v" ^ (string_of_int $ List.length !varPositions) in
-			varPositions := (s, name) :: !varPositions;
+  | AssignExp (s, _) -> let name = "v" ^ (string_of_int $ List.length !gVarPositions) in
+			gVarPositions := (s, name) :: !gVarPositions;
 			name ^ ":\t.space 8\n"
   | _ -> ""
 	   
 (** Converts one expression to assembly *)
 let rec expToAsm (e : expression) = match e with
   | Value l -> (match l with
-		| Int i -> "\tpush $" ^ (string_of_int i) ^ "\n"
+		| Int i -> "\tpushq $" ^ (string_of_int i) ^ "\n"
 		| Bool b -> (match b with
-			     | true ->" \tpush $1\n"
-			     | false -> "\tpush $0\n")
+			     | true ->" \tpushq $1\n"
+			     | false -> "\tpushq $0\n")
 		(* Temporarily just rounds floats down! *)
-		| Float f -> "\tpush $" ^  (string_of_int (int_of_float (floor f))) ^ "\n"
-		(*| Var v -> "\tpush " ^ (findVarName v (!varPositions)) ^ "(%rip)\n"*)
-		| Var v -> "\tpush -" ^ (string_of_int $ findVarPos v (!varPositions2)) ^ "(%rbp)\n"
+		| Float f -> "\tpushq $" ^  (string_of_int (int_of_float (floor f))) ^ "\n"
+		(*| Var v -> "\tpush " ^ (findVarName v (!gVarPositions)) ^ "(%rip)\n"*)
+		| Var v -> "\tpushq -" ^ (string_of_int $ findVarPos v (!lVarPositions)) ^ "(%rbp)\n"
 		| _ -> exit 1)
 
   | Plus (n, m) -> (expToAsm n) ^ (expToAsm m) ^ asm_add
@@ -85,14 +85,14 @@ let rec expToAsm (e : expression) = match e with
   | And (p, q) -> (expToAsm p) ^ (expToAsm q) ^ asm_and
   | Or (p, q) -> (expToAsm p) ^ (expToAsm q) ^ asm_or
 
-  (*| AssignExp (s, e) -> (expToAsm e) ^ "\tpop " ^ (findVarName s (!varPositions)) ^ "(%rip)\n"*)
-  (*| AssignExp (s, e) -> let len = (List.length !varPositions2) + 1 in
+  (*| AssignExp (s, e) -> (expToAsm e) ^ "\tpop " ^ (findVarName s (!gVarPositions)) ^ "(%rip)\n"*)
+  (*| AssignExp (s, e) -> let len = (List.length !lVarPositions) + 1 in
 			let () = print_string "first\n" in
-			let () = varPositions2 := ((s, (len * 4)) :: !varPositions2) in
+			let () = lVarPositions := ((s, (len * 4)) :: !lVarPositions) in
 			let () = print_string "second\n" in
 			(expToAsm e) ^ (asm_asnVar (len * 4)) *)
   | AssignExp (s, e) -> let pos = addVar s in
-			(expToAsm e) ^ (if ((List.length !varPositions2) mod 2) = 1
+			(expToAsm e) ^ (if ((List.length !lVarPositions) mod 2) = 1
 					then (asm_asnVarAndMakeRoom pos)
 					else (asm_asnVar pos))
 
@@ -113,25 +113,32 @@ let rec expToAsm (e : expression) = match e with
 			   let rec popVars = function
 			     | [] -> ""
 			     | hd::tl -> let pos = addVar hd in
-					 (if ((List.length !varPositions2) mod 2) = 1
+					 (if ((List.length !lVarPositions) mod 2) = 1
 					  then (asm_asnVarAndMakeRoom pos)
 					  else (asm_asnVar pos))
 					 ^ popVars tl in
-			   let letsAndVars = (countLets p) + (List.length xs) in 
-			   let labelName = s ^ (string_of_int $ List.length !labels) in
+			   let letsAndVars = (countLets p) + (List.length xs) in
+			   (* Ensure no conflicts? *)
+			   let labelName = s (*^ (string_of_int $ List.length !labels)*) in
 			   let endLabel = labelName ^ "e" in
 			   labels := labelName :: !labels;
-                           (varPositions2 := (drop letsAndVars !varPositions2); "\tjmp ")
+			   (lVarPositions := (drop letsAndVars !lVarPositions);
+                           "\tjmp ")
 			   ^ endLabel ^ "\n"
 			   ^ (labelName ^ ":\n")
-			   ^ (popVars xs)
-			   ^ "\tpush %rbp\n"
+			   ^ "\tmovq %rbp, %rcx\n" (* ? should push to stack ? *)
 			   ^ "\tmovq %rsp, %rbp\n"
+			   ^ (popVars xs)
 			   ^ (listExpToAsm p "")
+			   ^ "\tpopq %rax\n" (* keep variable in %rsi whilst stackframe restored *)
 			   ^ (deallocStackString letsAndVars) 			       
-			   ^ "\tpop %rbp\n"
-			   ^ "\tret\n"
+			   ^ "\tmovq %rcx, %rbp\n" (* ? should pop from stack ? *)
+			   (*^ "\tpushq %rsi\n" (* push %rsi to the new stackframe *)*)
+			   ^ "\tretq\n"
 			   ^ endLabel ^ ":\n"
+
+  | FunCall (n, l) -> (* TODO: ensure the function n exists *)
+     (List.fold_right (fun e -> (^) (expToAsm e)) l "") ^ callFunction n
 				      
   | _ -> raise $ CompilationError "Currently unsupported expression.\n"
 	      
@@ -141,10 +148,8 @@ and listExpToAsm (p : program) acc = match p with
   | hd::tl -> listExpToAsm tl (acc ^ (expToAsm hd))
 
 (** Returns a string that deallocates the memory allocated to variables currently on the stack amounting to int i *)
-and deallocStackString i = "\taddq $" ^ (string_of_int
-					   (16 + (16 *
-						    (int_of_float
-						       (((float_of_int i) /. 2.)) - 1)))) ^ ", %rsp\n"
+and deallocStackString i = let amount = (16 * (int_of_float (((float_of_int i) /. 2.))))
+                           in "\taddq $" ^ (string_of_int (16 + amount)) ^ ", %rsp\n"
 											
 (** Converts a program to assembly *)
 (*let programToAsm (p : program) =

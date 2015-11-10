@@ -37,6 +37,7 @@
 %token DIV
 %token MOD
 %token EOF
+%token BACKTICK
 %right SEMICOLON
 %left AND
 %left OR
@@ -64,7 +65,7 @@ statement:
   | a = assignmentT; SEMICOLON+ { a }
   | f = func; SEMICOLON+ { Function f }
   | l = lambda  { Lambda l }
-(*| f = funCall { f } *)
+  | f = funCall { f }
 
 expression:
   | v = VAR { Value (Var v) }
@@ -94,10 +95,10 @@ expression:
   | e = expression; LTEQ; e2 = expression    { LTEQ (e, e2) }
   | e = expression; GTEQ; e2 = expression    { GTEQ (e, e2) }
 					  
-(*
 funCall:
-  | v = VAR; l = list(expression) { FunCall (v, l) }
+  | BACKTICK; v = VAR; l = list(expression); BACKTICK { FunCall (v, l) }
 
+(*
 lambdaApplication:
   | l = lambda; 
 

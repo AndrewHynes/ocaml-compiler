@@ -160,7 +160,7 @@ A function can be defined using the keyword func. The function's body is enclose
 func double x = 
 { 
   x * 2 
-}
+};
 #+END_SRC
 
 #+BEGIN_SRC language
@@ -169,8 +169,23 @@ func printAndAdd30 x =
   let x = 30;
   print x;
   x + 30
-}
+};
 #+END_SRC
+
+Functions can be applied with backticks (using the syntax `f arg1 arg2`), as follows:
+
+#+BEGIN_SRC language
+func printAndAdd30 x = 
+{ 
+  let x = 30;
+  print x;
+  x + 30
+};
+
+let x = `printAndAdd30 20`;
+x
+#+END_SRC
+
 
 * Optimisation
 
