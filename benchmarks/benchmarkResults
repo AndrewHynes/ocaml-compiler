@@ -32,5 +32,36 @@ C: .001s
 OCaml: .003s
 Python: could not compile
 
+VARIABLES:
+[andrew@haru variableBenchmarks]$ time ./variables
+567
+
+real	0m0.001s
+user	0m0.000s
+sys	0m0.000s
+[andrew@haru variableBenchmarks]$ time ./cVariables 
+567
+
+real	0m0.001s
+user	0m0.000s
+sys	0m0.000s
+[andrew@haru variableBenchmarks]$ time ./ocamlVariables 
+567
+
+real	0m0.002s
+user	0m0.000s
+sys	0m0.000s
+[andrew@haru variableBenchmarks]$ time python variables.py
+567
+
+real	0m0.037s
+user	0m0.033s
+sys	0m0.000s
+
+
+CALF: .001s
+C: .001s
+OCaml: .002s
+Python: 0.037s
 
 
