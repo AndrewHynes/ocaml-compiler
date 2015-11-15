@@ -72,6 +72,12 @@ FUNCTIONS:
 real	0m0.129s
 user	0m0.127s
 sys	0m0.000s
+[andrew@haru functionBenchmarks]$ time ./fib
+14930352
+
+real	0m0.543s
+user	0m0.543s
+sys	0m0.000s
 [andrew@haru functionBenchmarks]$ time ./ocamlFib 
 14930352
 
@@ -85,7 +91,7 @@ real	0m4.306s
 user	0m4.300s
 sys	0m0.007s
 
-CALF: ?
+CALF: 0.543s
 C: .128s
 OCaml: .731s
 Python: 4.306s
