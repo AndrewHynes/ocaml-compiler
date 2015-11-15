@@ -19,17 +19,17 @@ main:
 \n"
 
 let asm_suffix = "
-\tlea format(%rip), %rdi 
+\tleaq format(%rip), %rdi 
 \tpopq %rsi
-\tcall printf
-\tmov $0, %rdi 
-\tcall exit\n"
+\tcallq printf
+\tmovq $0, %rdi 
+\tcallq exit\n"
 
 (* Maths *)	   
 let asm_add = "
 \tpopq %rdi
 \tpopq %rsi
-\tadd %rdi, %rsi
+\taddq %rdi, %rsi
 \tpushq %rsi\n"
 
 let asm_mul = "
@@ -55,7 +55,7 @@ let asm_mod = "
 let asm_sub = "
 \tpopq %rdi
 \tpopq %rsi
-\tsub %rdi, %rsi
+\tsubq %rdi, %rsi
 \tpushq %rsi\n"
 
 (* Logic *)
@@ -149,9 +149,7 @@ let asm_ite labelName = "
 
 (* Variable from the stack *)
 let asm_getVar i = "
-\t 
 \tpopq %rsi -" ^ (string_of_int i) ^ "(%thing)
-
 \tpushq %rsi"
 
 (** Generates the assembly for the assignment of variables *)

@@ -26,11 +26,11 @@ let purgeAllLists (u : unit) = labels := [];
 			       functions := [];
 			       u
 
-(** Finds the position in the stack of a variable as written in the output assembly *)
-let rec findVarPos x = function
+(** Finds the position on the stack of a variable as written in the output assembly *)
+let rec findVar x = function
   | [] -> raise $ CompilationError ("Variable " ^ x ^ " never initialised.\n")
   | (a, b)::_ when x = a -> b
-  | _::tl -> findVarPos x tl
+  | _::tl -> findVar x tl
 			
 (** Removes a variable from the list *)
 let rec rmVar x = function
@@ -38,16 +38,13 @@ let rec rmVar x = function
   | (a, b)::tl when x = a -> tl
   | hd::tl -> hd::(rmVar x tl)
 
+(** Gets the amount of local variables currently on the stack *)
+let localVarLength l = List.length (List.filter (fun (_, n) -> n < 0) l)
+
 (** Adds a variable to the list of local variables *)
-let addLocalVar v = let len = List.length (List.filter (fun (_, n) -> n < 0) !lVarPositions) + 1 in
+let addLocalVar v = let len = (localVarLength !lVarPositions) + 1 in
 	       lVarPositions := (v, -(len * 8)) :: !lVarPositions;
                -(len * 8)
-
-(** Finds the name of a variable as written in the output assembly *)
-let rec findVarName x = function
-  | [] -> raise $ CompilationError ("Variable " ^ x ^ " never initialised.\n")
-  | (a, b)::_ when x = a -> b
-  | _::tl -> findVarName x tl
 
 (** Adds to the data segment of the output for each variable we need space for *)
 let makeDataSegment (e : expression) = match e with
@@ -66,7 +63,7 @@ let rec expToAsm (e : expression) = match e with
 		(* Temporarily just rounds floats down! *)
 		| Float f -> "\tpushq $" ^  (string_of_int (int_of_float (floor f))) ^ "\n"
 		(*| Var v -> "\tpush " ^ (findVarName v (!gVarPositions)) ^ "(%rip)\n"*)
-		| Var v -> "\tpushq " ^ (string_of_int $ findVarPos v (!lVarPositions)) ^ "(%rbp)\n"
+		| Var v -> "\tpushq " ^ (string_of_int $ findVar v (!lVarPositions)) ^ "(%rbp)\n"
 		| _ -> exit 1)
 
   | Plus (n, m) -> (expToAsm n) ^ (expToAsm m) ^ asm_add
@@ -86,7 +83,8 @@ let rec expToAsm (e : expression) = match e with
   | Or (p, q) -> (expToAsm p) ^ (expToAsm q) ^ asm_or
 
   | AssignExp (s, e) -> let pos = addLocalVar s in
-			(expToAsm e) ^ (if ((List.length !lVarPositions) mod 2) = 1
+			(expToAsm e) ^ (if (((localVarLength !lVarPositions) mod 2) = 1)
+			(*(expToAsm e) ^ (if (((List.length !lVarPositions) mod 2) = 1)*)
 					then (asm_asnVarAndMakeRoom pos)
 					else (asm_asnVar pos))
 
@@ -101,16 +99,20 @@ let rec expToAsm (e : expression) = match e with
 				    (endLabel ^ ":\n")
 
   (* Assumes that the variables given in xs will be pushed to the stack *)
-  | Function (s, xs, p) -> (* Ensure no conflicts here? *)
+  | Function (s, xs, p) -> (* Ensure no conflicts in function name? *)
      let labelName = s in
+     let rec countLets = function
+			     | [] -> 0
+			     | (AssignExp _)::tl -> 1 + countLets tl
+			     | hd::tl -> countLets tl in
      let args = List.length xs in
      let rec addArgs n l = match n, l with
        | _, [] -> ()
        | n, _ when n = (args + 2) -> ()
-       | n, (hd::tl) ->
-	  (lVarPositions := (hd, (n * 8)) :: !lVarPositions); addArgs (n + 1) tl in
+       | n, (hd::tl) -> (* positions are reversed because stack *)
+	  (lVarPositions := (hd, (((args + 3) * 8) - (n * 8))) :: !lVarPositions); addArgs (n + 1) tl in
      let endLabel = labelName ^ "_e" in
-     addArgs 2 xs; (* note: need to remove these from list afterwards *)
+     addArgs 2 xs; 
      functions := (s, xs) :: !functions;
      labels := labelName :: !labels;
      (* Note: OCaml folds from the right, so the following is evaluated last *)
@@ -122,6 +124,8 @@ let rec expToAsm (e : expression) = match e with
      ^ (listExpToAsm p "")
      ^ "\tpopq %rax\n"
      ^ "\tpopq %rbp\n"
+     (* Variables leave scope *)
+     ^ (if ((countLets p) = 0) then "" else ("\taddq $" ^ (correctVarAmount $ countLets p) ^ ", %rsp\n"))
      ^ "\tretq\n"
      ^ endLabel ^ ":\n"
 
