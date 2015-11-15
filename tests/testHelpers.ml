@@ -75,7 +75,7 @@ let rec prettyStringTests t = function
   | hd::tl -> let (expected, actual) = List.nth t hd in
 	      ("--- FAILED SYNTAX/PARSING TEST---\n" ^
 		 "Expected: " ^ expected ^
-		   "\nActual: " ^ actual ^ "\n\n")
+		   "\nActual:   " ^ actual ^ "\n\n")
 	      ::prettyStringTests t tl
 
 let rec prettyStringRTTests t = function

@@ -38,6 +38,7 @@
 %token MOD
 %token EOF
 %token BACKTICK
+%token APOSTROPHE
 %right SEMICOLON
 %left AND
 %left OR
@@ -65,7 +66,6 @@ statement:
   | a = assignmentT; SEMICOLON+ { a }
   | f = func; SEMICOLON+ { Function f }
   | l = lambda  { Lambda l }
-  | f = funCall { f }
 
 expression:
   | v = VAR { Value (Var v) }
@@ -88,21 +88,16 @@ expression:
 					 
   | ite = ifThenElse { ite }
   | p = printT; SEMICOLON+ { p }
+  | f = funCall { f }
 
   | e = expression; EQLOGIC; e2 = expression { EQ   (e, e2) }
-  | e = expression; LT; e2 = expression      { LT   (e, e2) }
-  | e = expression; GT; e2 = expression      { GT   (e, e2) }
-  | e = expression; LTEQ; e2 = expression    { LTEQ (e, e2) }
-  | e = expression; GTEQ; e2 = expression    { GTEQ (e, e2) }
+  | e = expression; LT;      e2 = expression { LT   (e, e2) }
+  | e = expression; GT;      e2 = expression { GT   (e, e2) }
+  | e = expression; LTEQ;    e2 = expression { LTEQ (e, e2) }
+  | e = expression; GTEQ;    e2 = expression { GTEQ (e, e2) }
 					  
 funCall:
-  | BACKTICK; v = VAR; l = list(expression); BACKTICK { FunCall (v, l) }
-
-(*
-lambdaApplication:
-  | l = lambda; 
-
-*)
+  | BACKTICK; v = VAR; l = nonempty_list(expression); APOSTROPHE { FunCall (v, l) }
 
 lambda:
   | LBRACK; l = lambda; RBRACK { l }

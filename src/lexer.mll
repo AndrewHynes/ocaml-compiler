@@ -70,6 +70,7 @@ rule read =
    | '{' { LBRACE }
    | '}' { RBRACE }
    | '`' { BACKTICK }
+   | '\'' { APOSTROPHE }
    | '#' { ignoreLine lexbuf }
    | letName { LET }
    | var { VAR (Lexing.lexeme lexbuf) }

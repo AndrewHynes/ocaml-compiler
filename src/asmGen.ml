@@ -16,10 +16,14 @@ let gVarPositions = ref []
 (** Keeps the position of local variables *)
 let lVarPositions = ref []
 
+(** Contains information about user-defined functions *)
+let functions = ref []
+
 (** Resets all of the lists (mainly for purpose of testing) *)
 let purgeAllLists (u : unit) = labels := [];
 			       gVarPositions := [];
 			       lVarPositions := [];
+			       functions := [];
 			       u
 
 (** Finds the position in the stack of a variable as written in the output assembly *)
@@ -27,7 +31,7 @@ let rec findVarPos x = function
   | [] -> raise $ CompilationError ("Variable " ^ x ^ " never initialised.\n")
   | (a, b)::_ when x = a -> b
   | _::tl -> findVarPos x tl
-
+			
 (** Removes a variable from the list *)
 let rec rmVar x = function
   | [] -> []
@@ -35,13 +39,9 @@ let rec rmVar x = function
   | hd::tl -> hd::(rmVar x tl)
 
 (** Adds a variable to the list of local variables *)
-let addVar v = let len = List.length !lVarPositions + 1 in
-	       (*lVarPositions := rmVar v !lVarPositions;*)
-	       (*(if (exists v lVarPositions)
-	       then rmVar v
-	       else ());*)
-	       lVarPositions := (v, (len * 8)) :: !lVarPositions;
-               (len * 8)
+let addLocalVar v = let len = List.length (List.filter (fun (_, n) -> n < 0) !lVarPositions) + 1 in
+	       lVarPositions := (v, -(len * 8)) :: !lVarPositions;
+               -(len * 8)
 
 (** Finds the name of a variable as written in the output assembly *)
 let rec findVarName x = function
@@ -66,7 +66,7 @@ let rec expToAsm (e : expression) = match e with
 		(* Temporarily just rounds floats down! *)
 		| Float f -> "\tpushq $" ^  (string_of_int (int_of_float (floor f))) ^ "\n"
 		(*| Var v -> "\tpush " ^ (findVarName v (!gVarPositions)) ^ "(%rip)\n"*)
-		| Var v -> "\tpushq -" ^ (string_of_int $ findVarPos v (!lVarPositions)) ^ "(%rbp)\n"
+		| Var v -> "\tpushq " ^ (string_of_int $ findVarPos v (!lVarPositions)) ^ "(%rbp)\n"
 		| _ -> exit 1)
 
   | Plus (n, m) -> (expToAsm n) ^ (expToAsm m) ^ asm_add
@@ -85,20 +85,15 @@ let rec expToAsm (e : expression) = match e with
   | And (p, q) -> (expToAsm p) ^ (expToAsm q) ^ asm_and
   | Or (p, q) -> (expToAsm p) ^ (expToAsm q) ^ asm_or
 
-  (*| AssignExp (s, e) -> (expToAsm e) ^ "\tpop " ^ (findVarName s (!gVarPositions)) ^ "(%rip)\n"*)
-  (*| AssignExp (s, e) -> let len = (List.length !lVarPositions) + 1 in
-			let () = print_string "first\n" in
-			let () = lVarPositions := ((s, (len * 4)) :: !lVarPositions) in
-			let () = print_string "second\n" in
-			(expToAsm e) ^ (asm_asnVar (len * 4)) *)
-  | AssignExp (s, e) -> let pos = addVar s in
+  | AssignExp (s, e) -> let pos = addLocalVar s in
 			(expToAsm e) ^ (if ((List.length !lVarPositions) mod 2) = 1
 					then (asm_asnVarAndMakeRoom pos)
 					else (asm_asnVar pos))
 
   | IfThenElse (b, e1, e2) -> let labelName = "l" ^ (string_of_int $ List.length !labels) in
-			      let endLabel = labelName ^ "e" in
+			      let endLabel = labelName ^ "_e" in
 			      let jmp = "\tjmp " ^ endLabel ^ "\n" in
+			      labels := labelName :: !labels;
 			      (* Note: It jumps if true, so false first, true second *)
 			      (expToAsm b) ^ (asm_ite labelName) ^
 				((expToAsm e2) ^ jmp) ^
@@ -106,40 +101,37 @@ let rec expToAsm (e : expression) = match e with
 				    (endLabel ^ ":\n")
 
   (* Assumes that the variables given in xs will be pushed to the stack *)
-  | Function (s, xs, p) -> let rec countLets = function
-			     | [] -> 0
-			     | (AssignExp _)::tl -> 1 + countLets tl
-			     | hd::tl -> countLets tl in
-			   let rec popVars = function
-			     | [] -> ""
-			     | hd::tl -> let pos = addVar hd in
-					 (if ((List.length !lVarPositions) mod 2) = 1
-					  then (asm_asnVarAndMakeRoom pos)
-					  else (asm_asnVar pos))
-					 ^ popVars tl in
-			   let letsAndVars = (countLets p) + (List.length xs) in
-			   (* Ensure no conflicts? *)
-			   let labelName = s (*^ (string_of_int $ List.length !labels)*) in
-			   let endLabel = labelName ^ "e" in
-			   labels := labelName :: !labels;
-			   (lVarPositions := (drop letsAndVars !lVarPositions);
-                           "\tjmp ")
-			   ^ endLabel ^ "\n"
-			   ^ (labelName ^ ":\n")
-			   ^ "\tmovq %rbp, %rcx\n" (* ? should push to stack ? *)
-			   ^ "\tmovq %rsp, %rbp\n"
-			   ^ (popVars xs)
-			   ^ (listExpToAsm p "")
-			   ^ "\tpopq %rax\n" (* keep variable in %rsi whilst stackframe restored *)
-			   ^ (deallocStackString letsAndVars) 			       
-			   ^ "\tmovq %rcx, %rbp\n" (* ? should pop from stack ? *)
-			   (*^ "\tpushq %rsi\n" (* push %rsi to the new stackframe *)*)
-			   ^ "\tretq\n"
-			   ^ endLabel ^ ":\n"
+  | Function (s, xs, p) -> (* Ensure no conflicts here (f and fe would have conflict)? *)
+     let labelName = s (*^ (string_of_int $ List.length !labels)*) in
+     let args = List.length xs in
+     let rec addArgs n l = match n, l with
+       | _, [] -> ()
+       | n, _ when n = (args + 2) -> ()
+       | n, (hd::tl) ->
+	  (lVarPositions := (hd, (n * 8)) :: !lVarPositions); addArgs (n + 1) tl in
+     let endLabel = labelName ^ "_e" in
+     addArgs 2 xs; (* note: need to remove these from list afterwards *)
+     functions := (s, xs) :: !functions;
+     labels := labelName :: !labels;
+     "\tjmp "
+     ^ endLabel ^ "\n"
+     ^ (labelName ^ ":\n")
+     ^ "\tpushq %rbp\n"
+     ^ "\tmovq %rsp, %rbp\n"
+     (*^ (popVars 0 xs)*)
+     ^ (listExpToAsm p "")
+     ^ "\tpopq %rax\n"
+     ^ "\tpopq %rbp\n"
+     ^ "\tretq\n"
+     ^ endLabel ^ ":\n"
 
-  | FunCall (n, l) -> (* TODO: ensure the function n exists *)
-     (List.fold_right (fun e -> (^) (expToAsm e)) l "") ^ callFunction n
-				      
+  | FunCall (n, l) ->
+     let args = List.length l in
+     (List.fold_right (fun e -> (^) (expToAsm e)) l "") ^
+       (asm_callFunction n) ^
+	 ("\taddq $" ^ (string_of_int $ 8 * args) ^ ", %rsp\n") ^
+	   ("\tpushq %rax\n")
+
   | _ -> raise $ CompilationError "Currently unsupported expression.\n"
 	      
 (** Turns a list of expressions to assembly *)
@@ -147,9 +139,10 @@ and listExpToAsm (p : program) acc = match p with
   | [] -> acc
   | hd::tl -> listExpToAsm tl (acc ^ (expToAsm hd))
 
+and correctVarAmount i = string_of_int $ (16 * (int_of_float (((float_of_int (i + 1)) /. 2.))))
+
 (** Returns a string that deallocates the memory allocated to variables currently on the stack amounting to int i *)
-and deallocStackString i = let amount = (16 * (int_of_float (((float_of_int i) /. 2.))))
-                           in "\taddq $" ^ (string_of_int (16 + amount)) ^ ", %rsp\n"
+and deallocStackString i = "\taddq $" ^ (correctVarAmount i) ^ ", %rsp\n"
 											
 (** Converts a program to assembly *)
 (*let programToAsm (p : program) =
@@ -160,3 +153,50 @@ let programToAsm (p : program) =
   asm_prefix ^ (listExpToAsm p "") ^ asm_suffix
 										
 		
+(*
+  | FunCall (n, l) -> (* TODO: ensure the function n exists *)
+     let args = List.length l in
+     ("\tsubq $" ^ (correctVarAmount args) ^ ", %rsp\n") ^
+       ((List.fold_right (fun e -> (^) ((expToAsm e) ^ "\n\tpopq 0(%rsp)\n")) l "") ) ^
+	 ("\taddq $" ^ (correctVarAmount args) ^ ", %rsp\n")
+	 ^ callFunction n
+
+  | FunCall (n, l) ->
+     let args = List.length l in
+     (*let rec pushArgs n l = match n, l with
+       | _, [] -> ""
+       | n, _ when n = (args + 1) -> ""
+       | n, (hd::tl) -> "\tpopq " ^ (string_of_int (n * 8)) ^ "(%rsp)\n" ^ pushArgs (n + 1) tl in*)
+     (try
+	 (let argNames = snd $ List.find (fun (a, _) -> a = n) !functions in
+	  ((*("\tsubq $" ^ (correctVarAmount args) ^ ", %rsp\n") ^*)
+	   (List.fold_right (fun e -> (^) (expToAsm e)) l "") ^
+	     (*(pushArgs 1 argNames) ^*)
+	       (asm_callFunction n) ^
+		 ("\taddq $" ^ (string_of_int $ 8 * args) ^ ", %rsp\n")) ^
+	           ("\tpushq %rax\n"))
+	  with
+	    Not_found -> raise $ CompilationError ("Function " ^ n ^ " never defined.\n"))
+
+
+	   
+ *)
+
+
+				       (*let rec countLets = function
+			     | [] -> 0
+			     | (AssignExp _)::tl -> 1 + countLets tl
+			     | hd::tl -> countLets tl in*)
+     					 (*(if ((List.length !lVarPositions) mod 2) = 1
+					  then (asm_asnVarAndMakeRoom pos)
+					  else (asm_asnVar pos))*)
+			   (*let rec popVars n = function
+			     | [] -> ""
+			     | hd::tl -> asm_getVarFromPos n
+					 ^ popVars (n + 8) tl in*)
+			   (*let rec getVar n = function
+			     | [] -> ""
+			     | hd::tl -> if (List.mem hd xs)
+					 asm_getVarFromPos n
+					    ^ popVars (n + 8) tl in*)
+			   (*let letsAndVars = (countLets p) + (List.length xs) in*)

@@ -64,4 +64,30 @@ C: .001s
 OCaml: .002s
 Python: 0.037s
 
+FUNCTIONS:
+
+[andrew@haru functionBenchmarks]$ time ./cFib 
+14930352
+
+real	0m0.129s
+user	0m0.127s
+sys	0m0.000s
+[andrew@haru functionBenchmarks]$ time ./ocamlFib 
+14930352
+
+real	0m0.731s
+user	0m0.730s
+sys	0m0.000s
+[andrew@haru functionBenchmarks]$ time python < fib.py
+14930352
+
+real	0m4.306s
+user	0m4.300s
+sys	0m0.007s
+
+CALF: ?
+C: .128s
+OCaml: .731s
+Python: 4.306s
+
 

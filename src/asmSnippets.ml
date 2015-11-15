@@ -85,7 +85,7 @@ let cmpAndPushSFOF = "
 \tcmp %rdi, %rsi
 \tpushf
 \tpopq %rsi
-\tmov %rsi, %rdi
+\tmovq %rsi, %rdi
 \tshr $7, %rsi
 \tshr $11, %rdi
 \tand $1, %rsi
@@ -157,41 +157,22 @@ let asm_getVar i = "
 (** Generates the assembly for the assignment of variables *)
 let asm_asnVar i = "
 \tpopq %rsi
-\tmovq %rsi, -" ^ (string_of_int i) ^ "(%rbp)\n"
+\tmovq %rsi, " ^ (string_of_int i) ^ "(%rbp)\n"
+
+(** Generates the assembly for assignment to the positive area of stack *)
+let asm_getVarFromPos i = "
+\tmovq " ^ (string_of_int i) ^ "(%rbp), %rsi\n"
+(*let asm_getVarFromPos i = "
+\tmovq " ^ (string_of_int i) ^ "(%rbp), %rsi\n"*)
 
 (** Generates the assembly for the assignment of variables, and makes room for two variables on the stack *)
 let asm_asnVarAndMakeRoom i = "
 \tpopq %rsi
 \tsubq $16, %rsp
-\tmovq %rsi, -" ^ (string_of_int i) ^ "(%rbp)\n"
+\tmovq %rsi, " ^ (string_of_int i) ^ "(%rbp)\n"
 					
-let callFunction fs = "
+let asm_callFunction fs = "
 \tcallq " ^ fs ^ "
-\tpushq %rax\n
 "
-								       
-(*
-let asm_prefix = " \t.section __TEXT,__cstring,cstring_literals
-format: 
-\t.string \"%d\\n\\0\" 
-\t.section__TEXT,
-\t.globl _main 
-_main: 
-\tpushq $0"
 
-function calls:
-\tpushqq %rbp
-\tmovq %rsp, %rbp
-\tmovl $8, -4(%rbp) //x = 8
-...
-\tpopq %rbp
-
-\tpopq %rsi
-\tsubq $16, %rsp
-\tmovl %rsi, %edi
-\tmovl %rsi, -4(%rbp)
-
-
-
- *)
 												     

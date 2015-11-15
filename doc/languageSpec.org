@@ -172,7 +172,7 @@ func printAndAdd30 x =
 };
 #+END_SRC
 
-Functions can be applied with backticks (using the syntax `f arg1 arg2`), as follows:
+Functions application must be surrounded with a backtick and an apostrophe (using the syntax `f arg1 arg2'), as follows:
 
 #+BEGIN_SRC language
 func printAndAdd30 x = 
@@ -182,7 +182,7 @@ func printAndAdd30 x =
   x + 30
 };
 
-let x = `printAndAdd30 20`;
+let x = `printAndAdd30 20';
 x
 #+END_SRC
 

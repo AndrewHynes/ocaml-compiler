@@ -20,7 +20,6 @@ let rec printVars = function
 let rec stringFromExpression = function
   | Value l -> stringFromLangType l
   | Application (e, e2) -> "(Application " ^ (stringFromExpression e) ^ ", " ^ (stringFromExpression e2) ^ ")"
-  (*| AssignVar (s, t) -> "(Assignment: " ^ s ^ " = variable " ^ t ^ ")"*)
   | AssignExp (s, e) -> "(Assignment: " ^ s ^ " = " ^ (stringFromExpression e) ^ ")"
   | AssignFunc (v, vs, e) -> "(Assignment: " ^ v ^ " = " ^ (printVars vs) ^ ", (function body: " ^ (stringFromExpression e) ^ "))"
 								
@@ -28,8 +27,8 @@ let rec stringFromExpression = function
   | IfThenElse (b, e1, e2) -> "(If " ^ (stringFromExpression b) ^ ", Then (" ^ (stringFromExpression e1) ^ "), Else (" ^ (stringFromExpression e2) ^ "))"
 								      
   | Lambda (l, e) -> "(Lambda (VARIABLES: " ^ (printVars l) ^ "), " ^ (stringFromExpression e) ^ ")"
-  | Function (s, l, p) -> "(Function (name: " ^ s ^ ")" ^ ", (args: " ^ (printVars l) ^ ") (function body: " ^ (List.fold_right (fun e -> (^) @@ stringFromExpression e) p "") ^ "))"
-  | FunCall _ -> "(FUNCTION CALL)"
+  | Function (s, l, p) -> "(Function (name: " ^ s ^ ")" ^ ", (args: " ^ (printVars l) ^ "), (function body: " ^ (List.fold_right (fun e -> (^) @@ stringFromExpression e) p "") ^ "))"
+  | FunCall (s, l) -> "(FunCall " ^ "(func: " ^ s ^ "), (args:" ^ (List.fold_right (fun e -> (^) @@ ((" " ^ (stringFromExpression e)))) l "") ^ "))"
 				
   | Plus (n, m) -> "(Plus " ^ (stringFromExpression n) ^ ", " ^  (stringFromExpression m) ^ ")"
   | Times (n, m) -> "(Times " ^ (stringFromExpression n) ^ ", " ^  (stringFromExpression m) ^ ")"
