@@ -101,8 +101,8 @@ let rec expToAsm (e : expression) = match e with
 				    (endLabel ^ ":\n")
 
   (* Assumes that the variables given in xs will be pushed to the stack *)
-  | Function (s, xs, p) -> (* Ensure no conflicts here (f and fe would have conflict)? *)
-     let labelName = s (*^ (string_of_int $ List.length !labels)*) in
+  | Function (s, xs, p) -> (* Ensure no conflicts here? *)
+     let labelName = s in
      let args = List.length xs in
      let rec addArgs n l = match n, l with
        | _, [] -> ()
@@ -113,12 +113,12 @@ let rec expToAsm (e : expression) = match e with
      addArgs 2 xs; (* note: need to remove these from list afterwards *)
      functions := (s, xs) :: !functions;
      labels := labelName :: !labels;
-     "\tjmp "
+     (* Note: OCaml folds from the right, so the following is evaluated last *)
+     (lVarPositions := drop args !lVarPositions; "\tjmp ")
      ^ endLabel ^ "\n"
      ^ (labelName ^ ":\n")
      ^ "\tpushq %rbp\n"
      ^ "\tmovq %rsp, %rbp\n"
-     (*^ (popVars 0 xs)*)
      ^ (listExpToAsm p "")
      ^ "\tpopq %rax\n"
      ^ "\tpopq %rbp\n"

@@ -65,7 +65,6 @@ OCaml: .002s
 Python: 0.037s
 
 FUNCTIONS:
-
 [andrew@haru functionBenchmarks]$ time ./cFib 
 14930352
 
