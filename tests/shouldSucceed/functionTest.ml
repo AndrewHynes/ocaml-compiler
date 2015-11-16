@@ -42,12 +42,13 @@ let rtTests = [
     ("201\n", (stringToAsm, "func g x = { if x == 50 then 100 else 200 }; func f x = { x + `g 23' }; `f 1'"));
     ("201\n", (stringToOptimisedAsm, "func g x = { if x == 50 then 100 else 200 }; func f x = { x + `g 23' }; `f 1'"));      
 
+    ("50\n", (stringToAsm, "let x = 50; func f y = { x }; `f 0'"));
     ("50\n", (stringToOptimisedAsm, "let x = 50; func f y = { x }; `f 0'"));
     
     ("16\n", (stringToAsm, "func f x y z = { let a = 1; let b = 2; let c = 3; let d = 4; a + b + c + d + x + y + z }; `f 1 2 3'"));
     ("16\n", (stringToOptimisedAsm, "func f x y z = { let a = 1; let b = 2; let c = 3; let d = 4; a + b + c + d + x + y + z }; `f 1 2 3'"));
 
-    ("17711\n", (stringToAsm, "    func fib x =
+    ("17711\n", (stringToAsm, "func fib x =
 			    {
 			    if (x <= 2)
 			    then 1
@@ -56,7 +57,7 @@ let rtTests = [
 
 			    `fib 22'"));
 
-    ("17711\n", (stringToOptimisedAsm, "    func fib x =
+    ("17711\n", (stringToOptimisedAsm, "func fib x =
 					{
 					if (x <= 2)
 					then 1
@@ -65,6 +66,26 @@ let rtTests = [
 					
 					`fib 22'"));
 
+    ("17711\n", (stringToAsm, "let retVal = 1;
+			       func fib x =
+			       {
+			       if (x <= 2)
+			       then retVal
+			       else (`fib (x - 1)' + `fib (x - 2)')
+			       };
+			       
+			       `fib 22'"));
+    
+    ("17711\n", (stringToOptimisedAsm, "let retVal = 1;
+					func fib x =
+					{
+					if (x <= 2)
+					then retVal
+					else (`fib (x - 1)' + `fib (x - 2)')
+					};
+					
+					`fib 22'"));
+
     
   ]
-		
+

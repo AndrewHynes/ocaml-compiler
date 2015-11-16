@@ -1,5 +1,5 @@
 #FLAGS = -r -use-menhir -use-ocamlfind -package ollvm -I
-FLAGS = -r -use-menhir -use-ocamlfind -I +llvm-3.7 -I
+FLAGS = -r -use-menhir -use-ocamlfind -I
 OCB = ocamlbuild $(FLAGS)
 
 .PHONY: doc
