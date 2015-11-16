@@ -48,6 +48,9 @@ let rtTests = [
     ("16\n", (stringToAsm, "func f x y z = { let a = 1; let b = 2; let c = 3; let d = 4; a + b + c + d + x + y + z }; `f 1 2 3'"));
     ("16\n", (stringToOptimisedAsm, "func f x y z = { let a = 1; let b = 2; let c = 3; let d = 4; a + b + c + d + x + y + z }; `f 1 2 3'"));
 
+    ("15\n", (stringToAsm, "let a = 1; let b = 2; func f x y = { let c = a + x; let d = b + y; c + d }; `f 5 7'"));
+    ("15\n", (stringToOptimisedAsm, "let a = 1; let b = 2; func f x y = { let c = a + x; let d = b + y; c + d }; `f 5 7'"));
+
     ("17711\n", (stringToAsm, "func fib x =
 			    {
 			    if (x <= 2)
