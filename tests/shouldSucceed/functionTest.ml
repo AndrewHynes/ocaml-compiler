@@ -17,6 +17,12 @@ let tests = [
     ("(Assignment: x = 50)(Function (name: f), (args: identifier : y), (function body: x))(FunCall (func: f), (args: 0))", stringToAST "let x = 50; func f y = { x }; `f 0'");
     ("(Function (name: f), (args: identifier : y), (function body: 50))(FunCall (func: f), (args: 0))", stringToOptimisedAST "let x = 50; func f y = { x }; `f 0'");
 
+    ("(Assignment: x = 50)(Function (name: f), (args: identifier : z), (function body: (Assignment: y = 5)(Plus x, y)))(FunCall (func: f), (args: 0))", stringToAST "let x = 50; func f z = { let y = 5; x + y }; `f 0'");
+    ("(Function (name: f), (args: identifier : z), (function body: 55.))(FunCall (func: f), (args: 0))", stringToOptimisedAST "let x = 50; func f z = { let y = 5; x + y }; `f 0'");
+
+    ("(Function (name: f), (args: identifier : x), (function body: (Plus x, x)))(FunCall (func: f), (args: (Plus 1, 2)))", stringToAST "func f x = { x + x }; `f (1 + 2)'");
+    ("(Function (name: f), (args: identifier : x), (function body: (Plus x, x)))(FunCall (func: f), (args: 3.))", stringToOptimisedAST "func f x = { x + x }; `f (1 + 2)'");
+    
   ]
 
 let rtTests = [

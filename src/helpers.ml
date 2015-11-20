@@ -11,14 +11,14 @@ let tail = function
 
 (** Helper function that drops n elements from the front of a list *)
 let rec drop n xs = match n with
-  | 0 -> xs
+  | n when n <= 0 -> xs
   | n -> drop (n - 1) (tail xs)
 
 (** Helper function that takes the first n elements from the front of a list *)
 let rec take n xs = match xs with
   | [] -> []
-  | _ when n > 0 -> []
-  | hd::tl -> hd::(take (n - 1) xs)
+  | _ when n <= 0 -> []
+  | hd::tl -> hd::(take (n - 1) tl)
 
 (** Haskell style $ *)
 let ($) = (@@)

@@ -203,19 +203,20 @@ let rec propagateExp (v : string) (ve : expression) = function
 		      then Lambda (xs, propagateExp v ve e)
 		      else Lambda (xs, e)
 
-  | Function (s, xs, p) -> if (not (exists v xs))
-			   then (* Note: The following has been done to cover cases such as
+  | Function (s, xs, p) -> if (not (exists v xs)) (* if it's not in the function's arguments *)
+			   then
+			     (* The following has been done to cover cases such as
                                    let x = 3;
                                    func f y = { let x = 4; x + y } *)
 			     (* Gets the first assignment statement assigning to the
 			        same name as the variable we're trying to propagate *)
 			     let rec findFirstAssign acc v = function
 			       | [] -> -1
-			       | (AssignExp (s, _))::tl when s = v -> acc 
+			       | (AssignExp (s, _))::tl when s = v -> acc
 			       | hd::tl -> findFirstAssign (acc + 1) v tl in
                              let pos = findFirstAssign 0 v p in
 			     if pos = -1
-			     then Function (s, xs, List.map (propagateExp v ve) p)
+			     then Function (s, xs, propagateConstants (List.map (propagateExp v ve) p))
 			     else Function (s, xs, (propagateConst v ve (take pos p)) @
 						      (propagateConstants @@ drop pos p))
 			   else Function (s, xs, propagateConstants p)

@@ -74,7 +74,7 @@ let rec expToAsm (e : expression) (b : bool) = match e with
 			("\tpushq " ^ (string_of_int $ pos) ^ "(%rbp)\n"))
 		     with
 		       CompilationError _ -> "\tpushq " ^ (findVar v (!gVarPositions)) ^ "(%rip)\n")
-		| _ -> exit 1)
+		| _ -> raise $ CompilationError "Currently unsupported expression.\n")
  
   | Plus (n, m) -> (expToAsm n b) ^ (expToAsm m b) ^ asm_add
   | Minus (n, m) -> (expToAsm n b) ^ (expToAsm m b) ^ asm_sub
@@ -150,11 +150,14 @@ let rec expToAsm (e : expression) (b : bool) = match e with
      ^ endLabel ^ ":\n"
 
   | FunCall (n, l) ->
+     if (not $ exists n (List.map fst !functions))
+     then (raise $ CompilationError ("Function " ^ n ^ " has not been defined.\n"))
+     else (
      let args = List.length l in
      (List.fold_right (fun e -> (^) (expToAsm e b)) l "") ^
        (asm_callFunction n) ^
 	 ("\taddq $" ^ (string_of_int $ 8 * args) ^ ", %rsp\n") ^
-	   ("\tpushq %rax\n")
+	   ("\tpushq %rax\n"))
 
   | _ -> raise $ CompilationError "Currently unsupported expression.\n"
 	      
