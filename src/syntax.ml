@@ -34,8 +34,12 @@ type expression = Plus of expression * expression
 		| PrintExp of expression
 		| Lambda of lambdaExp
 		| Function of funct
-		| Application of expression * expression
 		| FunCall of string * (expression list)
+		(* variable name, boolean condition, program, loopWith *)
+		| While of expression * expression * (expression list) * expression
+		| Continue
+		| Break
+		| InjectAsm of string
  and lambdaExp = string list * expression
  (** A type for lambda expressions *)
  and funct = string * (string list) * (expression list)

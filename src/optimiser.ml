@@ -129,7 +129,6 @@ let rec foldConstants (exp : expression) = match exp with
   (* Folding the expressions inside expressions *)
   | PrintExp e -> PrintExp (foldConstants e)
   | AssignExp (s, e) -> AssignExp (s, foldConstants e)
-  | Application (e, e2) -> Application (foldConstants e, foldConstants e2)
   | Lambda (xs, e) -> Lambda (xs, foldConstants e)
   | Function (s, xs, p) -> Function (s, xs, List.map foldConstants p)
   | FunCall (s, es) -> FunCall (s, List.map foldConstants es)
@@ -148,21 +147,23 @@ let rec expContainsVar v = function
   | Minus (n, m) -> expContainsVar v n || expContainsVar v m
   | Div (n, m) -> expContainsVar v n || expContainsVar v m
   | Mod (n, m) -> expContainsVar v n || expContainsVar v m
+						       
   | Not b -> expContainsVar v b
+			    
   | And (b, c) -> expContainsVar v b || expContainsVar v c
   | Or (b, c) -> expContainsVar v b || expContainsVar v c
   | EQ (b, c) -> expContainsVar v b || expContainsVar v c
   | LT (b, c) -> expContainsVar v b || expContainsVar v c
   | GT (b, c) -> expContainsVar v b || expContainsVar v c
+						      
   | LTEQ (b, c) -> expContainsVar v b || expContainsVar v c
   | GTEQ (b, c) -> expContainsVar v b || expContainsVar v c
   | IfThenElse (b, e1, e2) -> expContainsVar v b || expContainsVar v e1 || expContainsVar v e2
 
-  | PrintExp e -> expContainsVar v e
-  | Application (e, e2) -> expContainsVar v e || expContainsVar v e2
   | AssignExp (s, e) -> expContainsVar v e
+  | PrintExp e -> expContainsVar v e
   | Lambda (xs, e) -> expContainsVar v e && (not (exists v xs))
-  | Function (s, xs, p) -> (List.fold_right (fun x -> (||) (expContainsVar v x)) p false) && (not (exists v xs))
+  | Function (s, xs, p) -> (List.fold_right (fun x -> (||) (expContainsVar v x)) p false) && (not (exists v xs))							       
   | FunCall (s, es) -> List.fold_right (fun e -> (||) (expContainsVar v e)) es false
 					
   | _ -> false
@@ -196,7 +197,6 @@ let rec propagateExp (v : string) (ve : expression) = function
   | IfThenElse (b, e1, e2) -> IfThenElse (propagateExp v ve b, propagateExp v ve e1, propagateExp v ve e2)
 					 
   | PrintExp e -> PrintExp (propagateExp v ve e)
-  | Application (e, e2) -> Application (propagateExp v ve e, propagateExp v ve e2)
   | AssignExp (s, e) -> AssignExp (s, propagateExp v ve e)
 				  
   | Lambda (xs, e) -> if (not (exists v xs))
@@ -241,14 +241,117 @@ and propagateConstants (p : program) = match p with
 					   else hd::propagateConstants tl)
 	       | x -> x::propagateConstants tl)
 
+
+		
 (** Fully optimises a program with every optimisation it can do. Includes:
 
 - Constant folding
 
-- Constant propagation
+- Constant propagation (including through functions)
 
 - Removing unused variables *)
-let optimise p = propagateConstants (List.map foldConstants p)
+and optimise p = (propagateConstants (List.map foldConstants p))
 
 
+(*
+NOTE: Following code is for function inlining. It partially worked, though function inlining would mean either my compiler has the potential to run forever or I would have to give some feature up (like Idris has) to ensure the compiler will never run forever, thereby removing Turing Completeness from my language. I didn't feel either were something I wanted my language to do so I didn't work on it after getting basic functionality. The code can, however, for legacy reasons, be found here:
+
+
+  (** Checks whether the function (name n) is called in program p *)
+and containsFunCall (s : string) (p : program) =
+  let contains t e = (match e with
+		      | FunCall (v, _) -> t = s
+		      | _ -> false) in
   
+  match p with
+  | [] -> false
+  | hd::tl -> (match hd with
+	       | FunCall (v, l) -> v = s || containsFunCall s tl
+							    
+	       | Plus (n, m) -> contains s n || contains s m || containsFunCall s tl
+	       | Times (n, m) -> contains s n || contains s m || containsFunCall s tl
+	       | Minus (n, m) -> contains s n || contains s m || containsFunCall s tl
+	       | Div (n, m) -> contains s n || contains s m || containsFunCall s tl
+	       | Mod (n, m) -> contains s n || contains s m || containsFunCall s tl
+								    
+	       | Not b -> contains s b || containsFunCall s tl
+	       | And (b, c) -> contains s b || contains s c || containsFunCall s tl
+	       | Or (b, c) -> contains s b || contains s c || containsFunCall s tl
+	       | EQ (b, c) -> contains s b || contains s c || containsFunCall s tl
+	       | LT (b, c) -> contains s b || contains s c || containsFunCall s tl
+	       | GT (b, c) -> contains s b || contains s c || containsFunCall s tl
+	       | LTEQ (b, c) -> contains s b || contains s c || containsFunCall s tl
+	       | GTEQ (b, c) -> contains s b || contains s c || containsFunCall s tl
+	       | IfThenElse (b, e1, e2) -> contains s b || contains s e1 || contains s e2 || containsFunCall s tl
+												       
+	       | PrintExp e -> contains s e || containsFunCall s tl
+	       | Function (s, xs, p) -> containsFunCall s p || containsFunCall s tl
+
+		  
+	       (*| Lambda (xs, e) -> expContainsVar v e && (not (exists v xs))*)
+	       | _ -> containsFunCall s tl)
+
+and inlineFunction (e : expression) fl = match e with
+  | FunCall (v, l) -> (if exists v (List.map (fun (a, _, _) -> a) fl)
+		       then (let func = List.find (fun (a, _, _) -> a = v) fl in
+			     let funcBody = (fun (_, _, p) -> p) func in
+			     let args = zip ((fun (_, b, _) -> b) func) l in
+			     let lets = List.map (fun (a, b) -> AssignExp (a, b)) args in
+		       	     let newProg = ((optimise (lets @ funcBody)) @ inlineFunctions tl fs) in
+			     if (containsFunCall v newProg)
+			     then (optimise ((Function func)::newProg)) (* note: may not terminate if program does not terminate! *)
+			     else newProg)
+		       else (* Almost certainly a compiler error! *)
+			 hd::inlineFunctions tl fs)
+							    
+  | Plus (n, m) -> Plus (inlineFunction n fl, inlineFunction m fl)
+  | Times (n, m) -> Times (inlineFunction n fl, inlineFunction m fl)
+  | Minus (n, m) -> Minus (inlineFunction n fl, inlineFunction m fl)
+  | Div (n, m) -> Div (inlineFunction n fl, inlineFunction m fl)
+  | Mod (n, m) -> Mod (inlineFunction n fl, inlineFunction m fl)
+								  
+  | Not b -> Not (inlineFunction b)
+  | And (b, c) -> And (inlineFunction b fl, inlineFunction c fl)
+  | Or (b, c) -> Or (inlineFunction b fl, inlineFunction c fl)
+  | EQ (b, c) -> EQ (inlineFunction b fl, inlineFunction c fl)
+  | LT (b, c) -> LT (inlineFunction b fl, inlineFunction c fl)
+  | GT (b, c) -> GT (inlineFunction b fl, inlineFunction c fl)
+  | LTEQ (b, c) -> LTEQ (inlineFunction b fl, inlineFunction c fl)
+  | GTEQ (b, c) -> GTEQ (inlineFunction b fl, inlineFunction c fl)
+  | IfThenElse (b, e1, e2) -> IfThenElse (inlineFunction b fl, inlineFunction e1 fl, inlineFunction e2 fl)
+												
+  | PrintExp e -> PrintExp (inlineFunction e)
+  | Function (s, xs, p) -> Function (s, xs, List.map (fun x -> inlineFunction x fl) p)
+								  
+  | x -> x
+	 	
+(** Inlines the functions of the language *)
+and inlineFunctions (p : program) (fs : program) = match p with
+  | [] -> []
+  | hd::tl -> (match hd with
+	       | Function (s, xs, prog) -> let f = Function (s, xs, prog) in
+					   let newFuns = if (containsFunCall s tl) then (f::fs) else fs in
+					   inlineFunctions tl newFuns
+
+	       | FunCall (v, l) -> let funcList = List.map (fun e -> (match e with
+								      | Function (a, b, c) -> (a, b, c)
+								      | _ -> exit 1)) fs in
+				   (if exists v (List.map (fun (a, _, _) -> a) funcList)
+				    then (let func = List.find (fun (a, _, _) -> a = v) funcList in
+					  let funcBody = (fun (_, _, p) -> p) func in
+					  let args = zip ((fun (_, b, _) -> b) func) l in
+					  let lets = List.map (fun (a, b) -> AssignExp (a, b)) args in
+		       			  let newProg = ((optimise (lets @ funcBody)) @ inlineFunctions tl fs) in
+					  if (containsFunCall v newProg)
+					  then (optimise ((Function func)::newProg)) (* note: may not terminate if program does not terminate! *)
+					  else newProg)
+				    else (* Almost certainly a compiler error! *)
+				      hd::inlineFunctions tl fs)
+				     
+				     
+		  
+	       | x -> x::inlineFunctions tl fs)
+
+
+and optimise p = inlineFunctions (propagateConstants (List.map foldConstants p)) []
+				  *)

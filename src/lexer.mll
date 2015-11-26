@@ -50,6 +50,10 @@ rule read =
    | "then" { THEN }
    | "else" { ELSE }
    | "mod" { MOD }
+   | "loopWith" { LOOPWITH }
+   | "while" { WHILE }
+   | "break" { BREAK }
+   | "continue" { CONTINUE }
    | "&&" { AND }
    | "||" { OR }
    | ';' { SEMICOLON }

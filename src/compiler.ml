@@ -19,7 +19,6 @@ let rec printVars = function
 
 let rec stringFromExpression = function
   | Value l -> stringFromLangType l
-  | Application (e, e2) -> "(Application " ^ (stringFromExpression e) ^ ", " ^ (stringFromExpression e2) ^ ")"
   | AssignExp (s, e) -> "(Assignment: " ^ s ^ " = " ^ (stringFromExpression e) ^ ")"
   | AssignFunc (v, vs, e) -> "(Assignment: " ^ v ^ " = " ^ (printVars vs) ^ ", (function body: " ^ (stringFromExpression e) ^ "))"
 								
@@ -45,8 +44,12 @@ let rec stringFromExpression = function
   | GT (b, c) -> "(GreaterThan " ^ (stringFromExpression b) ^ ", " ^ (stringFromExpression c) ^ ")"
   | LTEQ (b, c) -> "(LessThanOrEqualTo " ^ (stringFromExpression b) ^ ", " ^ (stringFromExpression c) ^ ")"
   | GTEQ (b, c) -> "(GreaterThanOrEqualTo " ^ (stringFromExpression b) ^ ", " ^ (stringFromExpression c) ^ ")"
+  | While (v, b, p, l) -> "(While)"
+  | Continue -> "Continue"
+  | Break -> "Break"
+  | _ -> ""
 
-(** Produces a string representing an abstract syntax tree *)												     
+(** Produces a string representing an abstract syntax tree*)	     
 let rec stringFromAST = function
   | [] -> ""
   | hd::tl -> (stringFromExpression hd) ^ (stringFromAST tl)

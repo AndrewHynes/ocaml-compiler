@@ -3,7 +3,7 @@
 let asm_dataSegment = "
 .data\n"
 			
-(* To assign the number 3 to a var defined as having space 8:
+(* To assign the number 3 to a var defined as having space 8: while(let x = 5) x < 10 { while(let y = 1) y < 5 { print x + y; loopWith y + 1 } loopWith x + 1 }
 \tmovq $3, var(%rip) 
 or to popq to a variable called var:
 \tpopq var(%rip)
@@ -18,10 +18,13 @@ main:
 \tmovq %rsp, %rbp
 \n"
 
-let asm_suffix = "
-\tleaq format(%rip), %rdi 
+let asm_print = "
+\tmovq $0, %rax
+\tleaq format(%rip), %rdi
 \tpopq %rsi
-\tcallq printf
+\tcallq printf\n"
+
+let asm_suffix = asm_print ^ "
 \tmovq $0, %rdi 
 \tcallq exit\n"
 
@@ -68,28 +71,28 @@ http://unixwiz.net/techtips/x86-jumps.html
 let zfE1 = "
 \tpushf
 \tpopq %rsi
-\tshr $6, %rsi
-\tand $1, %rsi
+\tshrq $6, %rsi
+\tandq $1, %rsi
 \tpushq %rsi\n"
 		
 (* EQ if ZF (bit 6) == 1 *)
 let asm_eq = "
 \tpopq %rdi
 \tpopq %rsi
-\tcmp %rdi, %rsi\n" ^ zfE1
+\tcmpq %rdi, %rsi\n" ^ zfE1
 
-(* Compares the two numbers at the top of the stack, then pushqes the SF flag and OF flag *)
+(* Compares the two numbers at the top of the stack, then pushes the SF flag and OF flag *)
 let cmpAndPushSFOF = "
 \tpopq %rdi
 \tpopq %rsi
-\tcmp %rdi, %rsi
+\tcmpq %rdi, %rsi
 \tpushf
 \tpopq %rsi
 \tmovq %rsi, %rdi
-\tshr $7, %rsi
-\tshr $11, %rdi
-\tand $1, %rsi
-\tand $1, %rdi
+\tshrq $7, %rsi
+\tshrq $11, %rdi
+\tandq $1, %rsi
+\tandq $1, %rdi
 \tpushq %rsi
 \tpushq %rdi\n"
 
@@ -98,7 +101,7 @@ let asm_gteq =  cmpAndPushSFOF ^ asm_eq
 
 let asm_negate = "
 \tpopq %rsi
-\ttest %rsi, %rsi\n" ^ zfE1
+\ttestq %rsi, %rsi\n" ^ zfE1
 
 (* 1 if the two numbers at the top of the stack are not equal, 0 otherwise *)
 let asm_neq = asm_eq ^ asm_negate
@@ -122,7 +125,7 @@ let asm_lteq = "\tpopq %rdi
 \tpushq %rdi" ^ asm_eq ^ "
 \tpopq %rsi
 \tpopq %rdi
-\tor %rdi, %rsi
+\torq %rdi, %rsi
 \tpushq %rsi\n"			  
 
 (* x GT y iff not (x LTEQ y) *)
@@ -132,19 +135,19 @@ let asm_gt = asm_lteq ^ asm_negate
 let asm_and = "
 \tpopq %rsi
 \tpopq %rdi
-\tand %rdi, %rsi
+\tandq %rdi, %rsi
 \tpushq %rsi\n"
 
 let asm_or = "
 \tpopq %rsi
 \tpopq %rdi
-\tor %rdi, %rsi
+\torq %rdi, %rsi
 \tpushq %rsi\n"
 
 (* Control flow... *)
 let asm_ite labelName = "
 \tpopq %rsi
-\tcmp $0, %rsi
+\tcmpq $0, %rsi
 \tjne " ^ labelName ^ "\n"
 
 (* Variable from the stack *)

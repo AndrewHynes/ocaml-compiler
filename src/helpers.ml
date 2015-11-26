@@ -20,6 +20,12 @@ let rec take n xs = match xs with
   | _ when n <= 0 -> []
   | hd::tl -> hd::(take (n - 1) tl)
 
+let rec zip l ls = match l, ls with
+  | [], [] -> []
+  | _, [] -> []
+  | [], _ -> []
+  | x::xs, y::ys -> (x, y) :: zip xs ys
+
 (** Haskell style $ *)
 let ($) = (@@)
 

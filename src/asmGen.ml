@@ -159,6 +159,25 @@ let rec expToAsm (e : expression) (b : bool) = match e with
 	 ("\taddq $" ^ (string_of_int $ 8 * args) ^ ", %rsp\n") ^
 	   ("\tpushq %rax\n"))
 
+  | PrintExp e -> (expToAsm e b) ^ asm_print
+
+  | While (a, b, p, l) -> let (varName, varVal) = (match a with
+						   | AssignExp (v, e) -> (v, e)
+						   | _ -> raise $ CompilationError "Currently unsupported expression.\n") in
+			  let labelName = "l" ^ (string_of_int $ List.length !labels) in
+			  labels := labelName :: !labels;
+			  let funCall = FunCall (labelName, [Value (Var varName)]) in
+			  let funEnd = (IfThenElse (b, funCall, Value (Int 0))) in
+			  let finalFun = (expToAsm (Function (labelName, [varName], (p @ [l; InjectAsm "\tpopq 16(%rbp)\n"; funEnd]))) true) in
+			  let foldedB = List.hd $ Optimiser.propagateConstants [a; b] in
+			  let finalCall = (expToAsm (IfThenElse (foldedB, (FunCall (labelName, [varVal])), (Value (Int 0)))) true) in
+                          (* First, make the function *)
+                          finalFun ^
+                          (* Then, call it if boolean satisfies *)
+			    finalCall
+
+  | InjectAsm s -> s
+ 
   | _ -> raise $ CompilationError "Currently unsupported expression.\n"
 	      
 (** Turns a list of expressions to assembly *)

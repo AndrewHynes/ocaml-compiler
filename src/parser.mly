@@ -11,6 +11,10 @@
 %token <bool> BOOL
 %token LET
 %token FUNC
+%token LOOPWITH
+%token WHILE
+%token CONTINUE
+%token BREAK
 %token EQUALS
 %token PRINT
 %token AND
@@ -90,6 +94,8 @@ expression:
   | p = printT; SEMICOLON+ { p }
   | f = funCall { f }
 
+  | w = whileExp { w }
+		 
   | e = expression; EQLOGIC; e2 = expression { EQ   (e, e2) }
   | e = expression; LT;      e2 = expression { LT   (e, e2) }
   | e = expression; GT;      e2 = expression { GT   (e, e2) }
@@ -121,5 +127,16 @@ assignmentT:
 
 ifThenElse:
   | IF; b = expression; THEN; e1 = expression; ELSE; e2 = expression { IfThenElse (b, e1, e2) }
+
+loopWith:
+  | LOOPWITH; e = expression { e }
+
+whileInternal:
+  | s = statement { s }
+  | CONTINUE { Continue }
+  | BREAK { Break }
+
+whileExp:
+  | WHILE; LBRACK; assign = assignmentT; RBRACK; b = expression; LBRACE; p = list(s = whileInternal { s }); l = loopWith; RBRACE { While (assign, b, p, l) }
 					 
 					 			    
