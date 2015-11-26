@@ -108,7 +108,7 @@ let rec expToAsm (e : expression) (b : bool) = match e with
 					     then (asm_asnVarAndMakeRoom pos)
 					     else (asm_asnVar pos)))
 
-  | IfThenElse (p, e1, e2) -> let labelName = "l" ^ (string_of_int $ List.length !labels) in
+  | IfThenElse (p, e1, e2) -> let labelName = "_l" ^ (string_of_int $ List.length !labels) in
 			      let endLabel = labelName ^ "_e" in
 			      let jmp = "\tjmp " ^ endLabel ^ "\n" in
 			      labels := labelName :: !labels;
@@ -124,6 +124,7 @@ let rec expToAsm (e : expression) (b : bool) = match e with
      let rec countLets = function
 			     | [] -> 0
 			     | (AssignExp _)::tl -> 1 + countLets tl
+			     | (While (_,_,_,_))::tl -> 1 + countLets tl
 			     | hd::tl -> countLets tl in
      let args = List.length xs in
      let rec addArgs n l = match n, l with
@@ -161,20 +162,37 @@ let rec expToAsm (e : expression) (b : bool) = match e with
 
   | PrintExp e -> (expToAsm e b) ^ asm_print
 
-  | While (a, b, p, l) -> let (varName, varVal) = (match a with
+  | While (a, pred, p, l) -> let (varName, varVal) = (match a with
 						   | AssignExp (v, e) -> (v, e)
 						   | _ -> raise $ CompilationError "Currently unsupported expression.\n") in
-			  let labelName = "l" ^ (string_of_int $ List.length !labels) in
+			  let labelName = "_w" ^ (string_of_int $ List.length !labels) in
 			  labels := labelName :: !labels;
-			  let funCall = FunCall (labelName, [Value (Var varName)]) in
-			  let funEnd = (IfThenElse (b, funCall, Value (Int 0))) in
-			  let finalFun = (expToAsm (Function (labelName, [varName], (p @ [l; InjectAsm "\tpopq 16(%rbp)\n"; funEnd]))) true) in
-			  let foldedB = List.hd $ Optimiser.propagateConstants [a; b] in
-			  let finalCall = (expToAsm (IfThenElse (foldedB, (FunCall (labelName, [varVal])), (Value (Int 0)))) true) in
-                          (* First, make the function *)
-                          finalFun ^
-                          (* Then, call it if boolean satisfies *)
-			    finalCall
+			  let assignVar =  (expToAsm a b) in
+			  let posOfValue = (try ((findVar varName !gVarPositions) ^ "(%rip)\n")
+					    with
+					    CompilationError _ -> ((string_of_int $ findVar varName !lVarPositions) ^ "(%rbp)\n")) in
+			  (* Put our value onto the stack *)
+			  assignVar ^
+			    (* Start the loop... *)
+			    (labelName ^ ":\n") ^
+  (*(labelName ^ ": push " ^ labelName ^ "\n") ^*)
+			      (expToAsm (IfThenElse (pred, InjectAsm "", Break)) b) ^
+				(listExpToAsm p b "") ^
+				  (* use l to impurely increment value we're using *)
+				  (expToAsm l b) ^
+				    ("\tpopq " ^ posOfValue) ^
+				      (* actually loop! *)
+				      ("\tjmp " ^ labelName ^ "\n") ^
+					(labelName ^ "_e:\n")
+  (*(labelName ^ "_e: pop " ^ labelName ^ "\n")*)
+
+  | Break -> (* popuntil lblin *)
+             (* jmp to lblout *)
+     let lbl = List.find (fun s -> Str.string_match (Str.regexp "_w[0-9]+") s 0) !labels in
+     (* Keep in list so we know how many labels we've had, but we've dealt with it *)
+     labels := ("_ww" ^ (Str.string_after lbl 2))::(delete lbl !labels);
+     ("\tjmp " ^ lbl ^ "_e\n")
+  | Continue -> ""
 
   | InjectAsm s -> s
  
@@ -196,3 +214,21 @@ let programToAsm (p : program) =
   let prog = (listExpToAsm p true "") in
   !dataSeg ^ asm_prefix ^ prog  ^ asm_suffix
 
+
+
+				    				     (*
+  | While (a, b, p, l) -> let (varName, varVal) = (match a with
+						   | AssignExp (v, e) -> (v, e)
+						   | _ -> raise $ CompilationError "Currently unsupported expression.\n") in
+			  let labelName = "l" ^ (string_of_int $ List.length !labels) in
+			  labels := labelName :: !labels;
+			  let funCall = FunCall (labelName, [Value (Var varName)]) in
+			  let funEnd = (IfThenElse (b, funCall, Value (Int 0))) in
+			  let finalFun = (expToAsm (Function (labelName, [varName], (p @ [l; InjectAsm "\tpopq 16(%rbp)\n"; funEnd]))) true) in
+			  let foldedB = List.hd $ Optimiser.propagateConstants [a; b] in
+			  let finalCall = (expToAsm (IfThenElse (foldedB, (FunCall (labelName, [varVal])), (Value (Int 0)))) true) in
+                          (* First, make the function *)
+                          finalFun ^
+                          (* Then, call it if boolean satisfies *)
+			    finalCall
+				      *)
