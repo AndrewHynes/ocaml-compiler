@@ -35,16 +35,3 @@ let rec zip l ls = match l, ls with
 
 (** Haskell style $ *)
 let ($) = (@@)
-
-
-	    
-	    (*
-while (let x = 1) x < 10 { while (let y = 10) y > 0 { print x + y; loopWith y - 1} loopWith x + 1 }
-
-while (let x = 1) x < 10 { while (let y = 1) !(y == 1) { print x + y; loopWith y - 1} loopWith x + 1 }
-
-while (let x = 1) x < 10 { while (let y = 1) !(y == 1) { print x + y; loopWith y - 1} print x; loopWith x + 1 }
-
-while (let x = 0) x <= 10 { print x; loopWith x + 1 }
-
- *)

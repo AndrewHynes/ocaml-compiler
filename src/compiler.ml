@@ -44,7 +44,7 @@ let rec stringFromExpression = function
   | GT (b, c) -> "(GreaterThan " ^ (stringFromExpression b) ^ ", " ^ (stringFromExpression c) ^ ")"
   | LTEQ (b, c) -> "(LessThanOrEqualTo " ^ (stringFromExpression b) ^ ", " ^ (stringFromExpression c) ^ ")"
   | GTEQ (b, c) -> "(GreaterThanOrEqualTo " ^ (stringFromExpression b) ^ ", " ^ (stringFromExpression c) ^ ")"
-  | While (v, b, p, l) -> "(While)"
+  | While (v, b, p, l) -> "(While (" ^ (stringFromExpression v) ^ ")(" ^ (stringFromExpression b) ^ ")(" ^ (List.fold_right (fun e -> (^) @@ (("" ^ (stringFromExpression e)))) p "") ^ "(" ^ (stringFromExpression l) ^ ")"
   | Continue -> "Continue"
   | Break -> "Break"
   | _ -> ""

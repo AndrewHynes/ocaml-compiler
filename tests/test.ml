@@ -2,9 +2,9 @@
 open TestHelpers
 
 (* A list of (expected, actual) *)
-let tests = BoolTest.tests @ MathsTest.tests @ LambdaTest.tests @ VariableTest.tests @ BadSyntaxTest.tests @ FunctionTest.tests @ FunctionAndVariableTest.tests
+let tests = BoolTest.tests @ MathsTest.tests @ LambdaTest.tests @ VariableTest.tests @ BadSyntaxTest.tests @ FunctionTest.tests @ FunctionAndVariableTest.tests @ WhileTest.tests
 
-let runtimeTests = BoolTest.rtTests @ MathsTest.rtTests @ VariableTest.rtTests @ BadSyntaxTest.rtTests @ FunctionTest.rtTests @ FunctionAndVariableTest.rtTests				   
+let runtimeTests = BoolTest.rtTests @ MathsTest.rtTests @ VariableTest.rtTests @ BadSyntaxTest.rtTests @ FunctionTest.rtTests @ FunctionAndVariableTest.rtTests @ WhileTest.rtTests
 
 let _ =
   let failed = indexesOfFalses @@ runTests tests in

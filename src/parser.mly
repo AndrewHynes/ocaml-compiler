@@ -94,7 +94,10 @@ expression:
   | p = printT; SEMICOLON+ { p }
   | f = funCall { f }
 
-  | w = whileExp { w }
+  | w = whileExp; SEMICOLON+ { w }
+  | CONTINUE; SEMICOLON+ { Continue }
+  | BREAK; SEMICOLON+ { Break }
+
 		 
   | e = expression; EQLOGIC; e2 = expression { EQ   (e, e2) }
   | e = expression; LT;      e2 = expression { LT   (e, e2) }
@@ -131,12 +134,11 @@ ifThenElse:
 loopWith:
   | LOOPWITH; e = expression { e }
 
+			     (*
 whileInternal:
-  | s = statement { s }
-  | CONTINUE { Continue }
-  | BREAK { Break }
+  | s = statement { s }*)
 
 whileExp:
-  | WHILE; LBRACK; assign = assignmentT; RBRACK; b = expression; LBRACE; p = list(s = whileInternal { s }); l = loopWith; RBRACE { While (assign, b, p, l) }
+  | WHILE; LBRACK; assign = assignmentT; RBRACK; b = expression; LBRACE; p = list(s = statement { s }); l = loopWith; RBRACE { While (assign, b, p, l) }
 					 
 					 			    

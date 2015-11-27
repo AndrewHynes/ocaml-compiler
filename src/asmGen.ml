@@ -170,13 +170,13 @@ let rec expToAsm (e : expression) (b : bool) = match e with
 			  let assignVar =  (expToAsm a b) in
 			  let posOfValue = (try ((findVar varName !gVarPositions) ^ "(%rip)\n")
 					    with
-					    CompilationError _ -> ((string_of_int $ findVar varName !lVarPositions) ^ "(%rbp)\n")) in
+					      CompilationError _ -> ((string_of_int $ findVar varName !lVarPositions) ^ "(%rbp)\n")) in
 			  (* Put our value onto the stack *)
-			  assignVar ^
+			  (labels := ("_ww" ^ (Str.string_after labelName 2))::(delete labelName !labels); assignVar) ^
 			    (* Start the loop... *)
 			    (labelName ^ ":\n") ^
   (*(labelName ^ ": push " ^ labelName ^ "\n") ^*)
-			      (expToAsm (IfThenElse (pred, InjectAsm "", Break)) b) ^
+			      (expToAsm (IfThenElse (pred, InjectAsm "", InjectAsm ("\tjmp " ^ labelName ^ "_e\n"))) b) ^
 				(listExpToAsm p b "") ^
 				  (* use l to impurely increment value we're using *)
 				  (expToAsm l b) ^
@@ -186,13 +186,20 @@ let rec expToAsm (e : expression) (b : bool) = match e with
 					(labelName ^ "_e:\n")
   (*(labelName ^ "_e: pop " ^ labelName ^ "\n")*)
 
-  | Break -> (* popuntil lblin *)
-             (* jmp to lblout *)
-     let lbl = List.find (fun s -> Str.string_match (Str.regexp "_w[0-9]+") s 0) !labels in
-     (* Keep in list so we know how many labels we've had, but we've dealt with it *)
-     labels := ("_ww" ^ (Str.string_after lbl 2))::(delete lbl !labels);
-     ("\tjmp " ^ lbl ^ "_e\n")
-  | Continue -> ""
+  | Break ->
+     (try let lbl = List.find (fun s -> Str.string_match (Str.regexp "_w[0-9]+") s 0) !labels in
+	  (* Keep in list so we know how many labels we've had, but we've dealt with it *)
+	  ("\tjmp " ^ lbl ^ "_e\n")
+      with
+	Not_found -> raise $ CompilationError "Break used whilst not in while loop.\n")
+
+       
+  | Continue ->
+     (try let lbl = List.find (fun s -> Str.string_match (Str.regexp "_w[0-9]+") s 0) !labels in
+	       (* Keep in list so we know how many labels we've had, but we've dealt with it *)
+	  ("\tjmp " ^ lbl ^ "\n")
+      with
+	Not_found -> raise $ CompilationError "Continue used whilst not in while loop.\n")
 
   | InjectAsm s -> s
  
@@ -202,7 +209,8 @@ let rec expToAsm (e : expression) (b : bool) = match e with
 and listExpToAsm (p : program) b acc = match p with
   | [] -> acc
   | hd::tl -> listExpToAsm tl b (acc ^ (expToAsm hd b))
-
+			   
+(** Gives the correct amount of space to allocate/deallocate on the stack for i variables *)
 and correctVarAmount i = string_of_int $ (16 * (int_of_float (((float_of_int (i + 1)) /. 2.))))
 
 (** Returns a string that deallocates the memory allocated to variables currently on the stack amounting to int i *)
@@ -231,4 +239,11 @@ let programToAsm (p : program) =
                           finalFun ^
                           (* Then, call it if boolean satisfies *)
 			    finalCall
+
+
+       
+  | Continue -> (try let lbl = List.find (fun s -> Str.string_match (Str.regexp "_w[0-9]+") s 0) !labels in
+		     (("\tjmp " ^ lbl ^ "\n"))
+		 with
+		   Not_found -> raise $ CompilationError "Continue used whilst not in while loop.\n")
 				      *)
