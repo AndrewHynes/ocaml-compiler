@@ -16,7 +16,13 @@ let tests = [
     
     ("(While ((Assignment: x = 1))((LessThan x, 10))((While ((Assignment: y = 1))((Not (Equals y, 1)))((Print: (Plus x, y))((Minus y, 1))(Print: x)((Plus x, 1))", stringToAST "while (let x = 1) x < 10 { while (let y = 1) !(y == 1) { print x + y; loopWith y - 1}; print x; loopWith x + 1 };");
     ("(While ((Assignment: x = 1))((LessThan x, 10))((While ((Assignment: y = 1))((Not (Equals y, 1)))((Print: (Plus x, y))((Minus y, 1))(Print: x)((Plus x, 1))", stringToOptimisedAST "while (let x = 1) x < 10 { while (let y = 1) !(y == 1) { print x + y; loopWith y - 1}; print x; loopWith x + 1 };");
-    
+
+    ("(While ((Assignment: x = (Minus 5, 4)))((LessThan x, 10))((While ((Assignment: y = 1))((Not (Equals y, 1)))((Print: (Plus x, y))((Minus y, 1))(Print: x)((Plus x, (Minus 2, 1)))", stringToAST "while (let x = (5 - 4)) x < 10 { while (let y = 1) !(y == 1) { print x + y; loopWith y - 1}; print x; loopWith x + (2 - 1) };");
+    ("(While ((Assignment: x = 1.))((LessThan x, 10))((While ((Assignment: y = 1))((Not (Equals y, 1)))((Print: (Plus x, y))((Minus y, 1))(Print: x)((Plus x, 1.))", stringToOptimisedAST "while (let x = (5 - 4)) x < 10 { while (let y = 1) !(y == 1) { print x + y; loopWith y - 1}; print x; loopWith x + (2 - 1) };");
+
+    ("(While ((Assignment: x = (Minus 5, 4)))((Not (Equals x, 1)))((Print: x)((Plus x, (Minus 2, 1)))", stringToAST "while (let x = (5 - 4)) !(x == 1) { print x; loopWith x + (2 - 1) };");
+    ("", stringToOptimisedAST "while (let x = (5 - 4)) !(x == 1) { print x; loopWith x + (2 - 1)};");
+    ("8.", stringToOptimisedAST "while (let x = (5 - 4)) !(x == 1) { print x; loopWith x + (2 - 1)}; 3 + 5");
 
   ]
 
@@ -76,6 +82,13 @@ let rtTests = [
 0
 ", (stringToOptimisedAsm, "while (let x = 1) x < 10 { while (let y = 1) !(y == 1) { print x + y; loopWith y - 1}; print x; loopWith x + 1 };"));
     
-     
+    ("0\n", (stringToAsm, "while (let x = (5 - 4)) !(x == 1) { print x; loopWith x + (2 - 1)};"));
+    ("0\n", (stringToAsm, "while (let x = (5 - 4)) !(x == 1) { print x; loopWith x + (2 - 1)};"));
+    
+    
+    ("8\n", (stringToAsm, "while (let x = (5 - 4)) !(x == 1) { print x; loopWith x + (2 - 1)}; 3 + 5"));
+    ("8\n", (stringToOptimisedAsm, "while (let x = (5 - 4)) !(x == 1) { print x; loopWith x + (2 - 1)}; 3 + 5"));
+
+    
   ]
 
