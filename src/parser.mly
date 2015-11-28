@@ -13,6 +13,7 @@
 %token FUNC
 %token LOOPWITH
 %token WHILE
+%token READ
 %token CONTINUE
 %token BREAK
 %token EQUALS
@@ -125,6 +126,7 @@ printT:
 assignmentT:
   | LBRACK; a = assignmentT; RBRACK { a }
   | LET; v = VAR; EQUALS; e = expression { AssignExp (v, e) }
+  | LET; v = VAR; EQUALS; READ { AssignInput v }
   | LET; v = VAR; EQUALS; l = lambda { match l with
 				       | (vs, e) -> AssignFunc (v, vs, e) }
 

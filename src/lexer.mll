@@ -54,6 +54,7 @@ rule read =
    | "while" { WHILE }
    | "break" { BREAK }
    | "continue" { CONTINUE }
+   | "read" { READ }
    | "&&" { AND }
    | "||" { OR }
    | ';' { SEMICOLON }

@@ -1,0 +1,6 @@
+while(let x = 0) x < 10000000 #10 million
+{
+	print x;
+	loopWith x + 1
+};
+

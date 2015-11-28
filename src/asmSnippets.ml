@@ -3,7 +3,7 @@
 let asm_dataSegment = "
 .data\n"
 			
-(* To assign the number 3 to a var defined as having space 8: while(let x = 5) x < 10 { while(let y = 1) y < 5 { print x + y; loopWith y + 1 } loopWith x + 1 }
+(* To assign the number 3 to a var defined as having space 8: 
 \tmovq $3, var(%rip) 
 or to popq to a variable called var:
 \tpopq var(%rip)
@@ -12,11 +12,12 @@ or to popq to a variable called var:
 let asm_prefix = "
 format:
 \t.string \"%d\\n\\0\"
+readFmt:
+\t.string \"%li\"
 \t.globl main
 main:
 \tpushq $0
-\tmovq %rsp, %rbp
-\n"
+\tmovq %rsp, %rbp\n"
 
 let asm_print = "
 \tmovq $0, %rax
@@ -24,6 +25,13 @@ let asm_print = "
 \tpopq %rsi
 \tcallq printf\n"
 
+(* argument = location of the variable, e.g. v(%rip) or -8(%rbp) *)
+let asm_readFromInput varLocation = "
+\tleaq " ^ varLocation ^ ", %rsi
+\tleaq readFmt(%rip), %rdi
+\tmovq $0, %rax
+\tcallq __isoc99_scanf\n"
+		  
 let asm_suffix = asm_print ^ "
 \tmovq $0, %rdi 
 \tcallq exit\n"

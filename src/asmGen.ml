@@ -34,14 +34,7 @@ let purgeAllLists (u : unit) = labels := [];
 let rec findVar x = function
   | [] -> raise $ CompilationError ("Variable " ^ x ^ " never initialised.\n")
   | (a, b)::_ when x = a -> b
-  | _::tl -> findVar x tl
-			
-(** Removes a variable from the list *)
-(*let rec rmVar x = function
-  | [] -> []
-  | (a, b)::tl when x = a -> tl
-  | hd::tl -> hd::(rmVar x tl)*)
-		     
+  | _::tl -> findVar x tl		     
 
 (** Gets the amount of local variables currently on the stack *)
 let localVarLength l = List.length (List.filter (fun (_, n) -> n < 0) l)
@@ -95,13 +88,13 @@ let rec expToAsm (e : expression) (b : bool) = match e with
   | AssignExp (s, e) -> if b
 			then
 			  (try
-			      ((expToAsm e b) ^ "\tpop " ^ (findVar s (!gVarPositions)) ^ "(%rip)\n")
+			      ((expToAsm e b) ^ "\tpopq " ^ (findVar s (!gVarPositions)) ^ "(%rip)\n")
 			    with (* If it's not already in the data segment, add it *)
 			      CompilationError _ ->
 			      (let name = "v" ^ (string_of_int $ List.length !gVarPositions) in
 			       gVarPositions := (s, name) :: !gVarPositions;
 			       (dataSeg := !dataSeg ^ (name ^ ":\t.space 8\n"));
-			       ((expToAsm e b) ^ "\tpop " ^ (findVar s (!gVarPositions)) ^ "(%rip)\n")))
+			       ((expToAsm e b) ^ "\tpopq " ^ (findVar s (!gVarPositions)) ^ "(%rip)\n")))
 			else (* It's a local variable *)
 			  (let pos = addLocalVar s in
 			   (expToAsm e b) ^ (if (((localVarLength !lVarPositions) mod 2) = 1)
@@ -161,7 +154,25 @@ let rec expToAsm (e : expression) (b : bool) = match e with
 	   ("\tpushq %rax\n"))
 
   | PrintExp e -> (expToAsm e b) ^ asm_print
-
+				     
+  (* (expToAsm (AssignExp (s, InjectAsm asm_readFromInput)) b) *)
+  | AssignInput s -> if b
+		     then
+		       (try
+			   ((expToAsm e b) ^ "\tpopq " ^ (findVar s (!gVarPositions)) ^ "(%rip)\n")
+			 with (* If it's not already in the data segment, add it *)
+			   CompilationError _ ->
+			   (let name = "v" ^ (string_of_int $ List.length !gVarPositions) in
+			    gVarPositions := (s, name) :: !gVarPositions;
+			    (dataSeg := !dataSeg ^ (name ^ ":\t.space 8\n"));
+			    asm_readFromInput ((findVar s (!gVarPositions)) ^ "(%rip)")))
+		     else (* It's a local variable *)
+		       (let pos = addLocalVar s in
+			let readString = (asm_readFromInput ((string_of_int pos) ^ "(%rbp)")) in
+			(if (((localVarLength !lVarPositions) mod 2) = 1)
+					  then "\tsubq $16, %rsp" ^ readString
+					  else readString))
+			 
   | While (a, pred, p, l) -> let (varName, varVal) = (match a with
 						   | AssignExp (v, e) -> (v, e)
 						   | _ -> raise $ CompilationError "Currently unsupported expression.\n") in
@@ -222,28 +233,3 @@ let programToAsm (p : program) =
   let prog = (listExpToAsm p true "") in
   !dataSeg ^ asm_prefix ^ prog  ^ asm_suffix
 
-
-
-				    				     (*
-  | While (a, b, p, l) -> let (varName, varVal) = (match a with
-						   | AssignExp (v, e) -> (v, e)
-						   | _ -> raise $ CompilationError "Currently unsupported expression.\n") in
-			  let labelName = "l" ^ (string_of_int $ List.length !labels) in
-			  labels := labelName :: !labels;
-			  let funCall = FunCall (labelName, [Value (Var varName)]) in
-			  let funEnd = (IfThenElse (b, funCall, Value (Int 0))) in
-			  let finalFun = (expToAsm (Function (labelName, [varName], (p @ [l; InjectAsm "\tpopq 16(%rbp)\n"; funEnd]))) true) in
-			  let foldedB = List.hd $ Optimiser.propagateConstants [a; b] in
-			  let finalCall = (expToAsm (IfThenElse (foldedB, (FunCall (labelName, [varVal])), (Value (Int 0)))) true) in
-                          (* First, make the function *)
-                          finalFun ^
-                          (* Then, call it if boolean satisfies *)
-			    finalCall
-
-
-       
-  | Continue -> (try let lbl = List.find (fun s -> Str.string_match (Str.regexp "_w[0-9]+") s 0) !labels in
-		     (("\tjmp " ^ lbl ^ "\n"))
-		 with
-		   Not_found -> raise $ CompilationError "Continue used whilst not in while loop.\n")
-				      *)

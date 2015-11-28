@@ -96,3 +96,32 @@ OCaml: .731s
 Python: 4.306s
 
 
+WHILE LOOPS:
+CALF:
+real	0m27.762s
+user	0m2.873s
+sys	0m9.060s
+
+C:
+real	0m27.180s
+user	0m2.213s
+sys	0m8.950s
+
+OCaml:
+real	0m30.362s
+user	0m4.560s
+sys	0m9.983s
+
+Python:
+real	1m2.117s
+user	0m33.670s
+sys	0m15.007s
+
+
+CALF: 27.7s
+C: 27.1s
+OCaml: 30.3s
+Python: 62.1s
+
+
+

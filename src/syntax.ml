@@ -26,6 +26,7 @@ type expression = Plus of expression * expression
 		| GTEQ of expression * expression
 			     
 		| AssignExp of string * expression
+		| AssignInput of string
 		| AssignFunc of string * (string list) * expression
 		(** The triple should contain: (name of new variable, arguments, body) *)
 

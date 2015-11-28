@@ -21,6 +21,7 @@ let rec stringFromExpression = function
   | Value l -> stringFromLangType l
   | AssignExp (s, e) -> "(Assignment: " ^ s ^ " = " ^ (stringFromExpression e) ^ ")"
   | AssignFunc (v, vs, e) -> "(Assignment: " ^ v ^ " = " ^ (printVars vs) ^ ", (function body: " ^ (stringFromExpression e) ^ "))"
+  | AssignInput s -> "(Assignment: " ^ s ^ " = (USER INPUT))"
 								
   | PrintExp e -> "(Print: " ^ (stringFromExpression e) ^ ")"
   | IfThenElse (b, e1, e2) -> "(If " ^ (stringFromExpression b) ^ ", Then (" ^ (stringFromExpression e1) ^ "), Else (" ^ (stringFromExpression e2) ^ "))"
