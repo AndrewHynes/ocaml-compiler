@@ -10,6 +10,7 @@
 <link title="AsmGen" rel="Chapter" href="AsmGen.html">
 <link title="AsmSnippets" rel="Chapter" href="AsmSnippets.html">
 <link title="Compiler" rel="Chapter" href="Compiler.html">
+<link title="Helpers" rel="Chapter" href="Helpers.html">
 <link title="MainParser" rel="Chapter" href="MainParser.html">
 <link title="Optimiser" rel="Chapter" href="Optimiser.html">
 <link title="Syntax" rel="Chapter" href="Syntax.html"><title>Index of values</title>
@@ -19,8 +20,14 @@
 &nbsp;</div>
 <h1>Index of values</h1>
 <table>
+<tr><td align="left"><br></td></tr>
+<tr><td><a href="Helpers.html#VAL($)">($)</a> [<a href="Helpers.html">Helpers</a>]</td>
+<td><div class="info">
+Haskell style $
+</div>
+</td></tr>
 <tr><td align="left"><br>A</td></tr>
-<tr><td><a href="AsmGen.html#VALaddVar">addVar</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<tr><td><a href="AsmGen.html#VALaddLocalVar">addLocalVar</a> [<a href="AsmGen.html">AsmGen</a>]</td>
 <td><div class="info">
 Adds a variable to the list of local variables
 </div>
@@ -39,6 +46,11 @@ Generates the assembly for the assignment of variables
 Generates the assembly for the assignment of variables, and makes room for two variables on the stack
 </div>
 </td></tr>
+<tr><td><a href="AsmSnippets.html#VALasm_callFunction">asm_callFunction</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
+<td><div class="info">
+Calls the function with the name fs
+</div>
+</td></tr>
 <tr><td><a href="AsmSnippets.html#VALasm_dataSegment">asm_dataSegment</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
 <td></td></tr>
 <tr><td><a href="AsmSnippets.html#VALasm_div">asm_div</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
@@ -47,12 +59,20 @@ Generates the assembly for the assignment of variables, and makes room for two v
 <td></td></tr>
 <tr><td><a href="AsmSnippets.html#VALasm_getVar">asm_getVar</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
 <td></td></tr>
+<tr><td><a href="AsmSnippets.html#VALasm_getVarFromPos">asm_getVarFromPos</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
+<td><div class="info">
+Generates the assembly for assignment to the positive area of stack
+</div>
+</td></tr>
 <tr><td><a href="AsmSnippets.html#VALasm_gt">asm_gt</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
 <td></td></tr>
 <tr><td><a href="AsmSnippets.html#VALasm_gteq">asm_gteq</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
 <td></td></tr>
 <tr><td><a href="AsmSnippets.html#VALasm_ite">asm_ite</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
-<td></td></tr>
+<td><div class="info">
+Makes an if statement with label name labelName
+</div>
+</td></tr>
 <tr><td><a href="AsmSnippets.html#VALasm_lt">asm_lt</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
 <td></td></tr>
 <tr><td><a href="AsmSnippets.html#VALasm_lteq">asm_lteq</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
@@ -69,6 +89,13 @@ Generates the assembly for the assignment of variables, and makes room for two v
 <td></td></tr>
 <tr><td><a href="AsmSnippets.html#VALasm_prefix">asm_prefix</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
 <td></td></tr>
+<tr><td><a href="AsmSnippets.html#VALasm_print">asm_print</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
+<td></td></tr>
+<tr><td><a href="AsmSnippets.html#VALasm_readFromInput">asm_readFromInput</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
+<td><div class="info">
+A function that reads a long integer from input (using scanf).
+</div>
+</td></tr>
 <tr><td><a href="AsmSnippets.html#VALasm_sub">asm_sub</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
 <td></td></tr>
 <tr><td><a href="AsmSnippets.html#VALasm_suffix">asm_suffix</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
@@ -76,8 +103,33 @@ Generates the assembly for the assignment of variables, and makes room for two v
 <tr><td align="left"><br>C</td></tr>
 <tr><td><a href="AsmSnippets.html#VALcmpAndPushSFOF">cmpAndPushSFOF</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
 <td></td></tr>
+<tr><td><a href="AsmGen.html#VALcorrectVarAmount">correctVarAmount</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<td><div class="info">
+Gives the correct amount of space to allocate/deallocate on the stack for i variables
+</div>
+</td></tr>
+<tr><td><a href="AsmGen.html#VALcountLets">countLets</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<td><div class="info">
+Counts the amount of lets in a program, which can be useful for local scopes to 'clean up' after themselves
+</div>
+</td></tr>
 <tr><td align="left"><br>D</td></tr>
-<tr><td><a href="Optimiser.html#VALdrop">drop</a> [<a href="Optimiser.html">Optimiser</a>]</td>
+<tr><td><a href="AsmGen.html#VALdataSeg">dataSeg</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<td><div class="info">
+Contains the status of the data segment
+</div>
+</td></tr>
+<tr><td><a href="AsmGen.html#VALdeallocStackString">deallocStackString</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<td><div class="info">
+Returns a string that deallocates the memory allocated to variables currently on the stack amounting to int i
+</div>
+</td></tr>
+<tr><td><a href="Helpers.html#VALdelete">delete</a> [<a href="Helpers.html">Helpers</a>]</td>
+<td><div class="info">
+Helper function that deletes the first occurence of some element in a list
+</div>
+</td></tr>
+<tr><td><a href="Helpers.html#VALdrop">drop</a> [<a href="Helpers.html">Helpers</a>]</td>
 <td><div class="info">
 Helper function that drops n elements from the front of a list
 </div>
@@ -93,12 +145,7 @@ Evaluates a constant expression containing only logic
 Evaluates a constant expression containing only maths
 </div>
 </td></tr>
-<tr><td><a href="Optimiser.html#VALexists">exists</a> [<a href="Optimiser.html">Optimiser</a>]</td>
-<td><div class="info">
-Helper function to see if something exists in a list
-</div>
-</td></tr>
-<tr><td><a href="AsmGen.html#VALexists">exists</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<tr><td><a href="Helpers.html#VALexists">exists</a> [<a href="Helpers.html">Helpers</a>]</td>
 <td><div class="info">
 Helper function to see if something exists in a list
 </div>
@@ -116,24 +163,25 @@ Converts one expression to assembly
 <tr><td align="left"><br>F</td></tr>
 <tr><td><a href="MainParser.html#VALfile">file</a> [<a href="MainParser.html">MainParser</a>]</td>
 <td></td></tr>
-<tr><td><a href="AsmGen.html#VALfindVarName">findVarName</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<tr><td><a href="AsmGen.html#VALfindVar">findVar</a> [<a href="AsmGen.html">AsmGen</a>]</td>
 <td><div class="info">
-Finds the name of a variable as written in the output assembly
-</div>
-</td></tr>
-<tr><td><a href="AsmGen.html#VALfindVarPos">findVarPos</a> [<a href="AsmGen.html">AsmGen</a>]</td>
-<td><div class="info">
-Finds the position in the stack of a variable as written in the output assembly
-</div>
-</td></tr>
-<tr><td><a href="Optimiser.html#VALfirstN">firstN</a> [<a href="Optimiser.html">Optimiser</a>]</td>
-<td><div class="info">
-Helper function that takes the first n elements from the front of a list
+Finds the position on the stack of a variable as written in the output assembly
 </div>
 </td></tr>
 <tr><td><a href="Optimiser.html#VALfoldConstants">foldConstants</a> [<a href="Optimiser.html">Optimiser</a>]</td>
 <td><div class="info">
 'Folds' the constants in a single expression, and performs optimisations such as:
+</div>
+</td></tr>
+<tr><td><a href="AsmGen.html#VALfunctions">functions</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<td><div class="info">
+Contains information about user-defined functions
+</div>
+</td></tr>
+<tr><td align="left"><br>G</td></tr>
+<tr><td><a href="AsmGen.html#VALgVarPositions">gVarPositions</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<td><div class="info">
+Keeps position of global variables (may be obsolete soon)
 </div>
 </td></tr>
 <tr><td align="left"><br>I</td></tr>
@@ -153,14 +201,29 @@ Checks to see if an expression contains only maths
 </div>
 </td></tr>
 <tr><td align="left"><br>L</td></tr>
+<tr><td><a href="AsmGen.html#VALlVarPositions">lVarPositions</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<td><div class="info">
+Keeps the position of local variables
+</div>
+</td></tr>
 <tr><td><a href="AsmGen.html#VALlabels">labels</a> [<a href="AsmGen.html">AsmGen</a>]</td>
 <td><div class="info">
-Keeps a list of all of the labels used (e.g.
+Keeps a list of all of the labels used (for use with branch instructions)
 </div>
 </td></tr>
 <tr><td><a href="Optimiser.html#VALlexpContainsVar">lexpContainsVar</a> [<a href="Optimiser.html">Optimiser</a>]</td>
 <td><div class="info">
 Checks if a list of expressions contains a variable
+</div>
+</td></tr>
+<tr><td><a href="AsmGen.html#VALlistExpToAsm">listExpToAsm</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<td><div class="info">
+Turns a list of expressions to assembly
+</div>
+</td></tr>
+<tr><td><a href="AsmGen.html#VALlocalVarLength">localVarLength</a> [<a href="AsmGen.html">AsmGen</a>]</td>
+<td><div class="info">
+Gets the amount of local variables currently on the stack
 </div>
 </td></tr>
 <tr><td align="left"><br>M</td></tr>
@@ -199,12 +262,18 @@ Parses the file, but may print an error if it cannot be parsed (such as due to i
 </div>
 </td></tr>
 <tr><td><a href="Compiler.html#VALprettyPrintPosition">prettyPrintPosition</a> [<a href="Compiler.html">Compiler</a>]</td>
-<td></td></tr>
+<td><div class="info">
+Prettily prints the position in the lexbuf we are
+</div>
+</td></tr>
 <tr><td><a href="Compiler.html#VALprintVars">printVars</a> [<a href="Compiler.html">Compiler</a>]</td>
-<td></td></tr>
+<td><div class="info">
+Turns a list of variables into a pretty string
+</div>
+</td></tr>
 <tr><td><a href="AsmGen.html#VALprogramToAsm">programToAsm</a> [<a href="AsmGen.html">AsmGen</a>]</td>
 <td><div class="info">
-Converts a program to assembly
+Converts a program p to assembly.
 </div>
 </td></tr>
 <tr><td><a href="Optimiser.html#VALpropagateConst">propagateConst</a> [<a href="Optimiser.html">Optimiser</a>]</td>
@@ -227,12 +296,6 @@ Propagates a constant variable through an expression
 Resets all of the lists (mainly for purpose of testing)
 </div>
 </td></tr>
-<tr><td align="left"><br>R</td></tr>
-<tr><td><a href="AsmGen.html#VALrmVar">rmVar</a> [<a href="AsmGen.html">AsmGen</a>]</td>
-<td><div class="info">
-Removes a variable from the list
-</div>
-</td></tr>
 <tr><td align="left"><br>S</td></tr>
 <tr><td><a href="Compiler.html#VALstringFromAST">stringFromAST</a> [<a href="Compiler.html">Compiler</a>]</td>
 <td><div class="info">
@@ -240,13 +303,24 @@ Produces a string representing an abstract syntax tree
 </div>
 </td></tr>
 <tr><td><a href="Compiler.html#VALstringFromExpression">stringFromExpression</a> [<a href="Compiler.html">Compiler</a>]</td>
-<td></td></tr>
+<td><div class="info">
+Turns an expression into a pretty string
+</div>
+</td></tr>
 <tr><td><a href="Compiler.html#VALstringFromLangType">stringFromLangType</a> [<a href="Compiler.html">Compiler</a>]</td>
-<td></td></tr>
+<td><div class="info">
+Takes a langType and returns a string
+</div>
+</td></tr>
 <tr><td align="left"><br>T</td></tr>
-<tr><td><a href="Optimiser.html#VALtail">tail</a> [<a href="Optimiser.html">Optimiser</a>]</td>
+<tr><td><a href="Helpers.html#VALtail">tail</a> [<a href="Helpers.html">Helpers</a>]</td>
 <td><div class="info">
 Helper function that safely gets the tail of a list
+</div>
+</td></tr>
+<tr><td><a href="Helpers.html#VALtake">take</a> [<a href="Helpers.html">Helpers</a>]</td>
+<td><div class="info">
+Helper function that takes the first n elements from the front of a list
 </div>
 </td></tr>
 <tr><td><a href="MainParser.html#VALtoParseTree">toParseTree</a> [<a href="MainParser.html">MainParser</a>]</td>
@@ -254,20 +328,14 @@ Helper function that safely gets the tail of a list
 Reads a lexbuf and turns it into a parse tree
 </div>
 </td></tr>
-<tr><td align="left"><br>V</td></tr>
-<tr><td><a href="AsmGen.html#VALvarPositions">varPositions</a> [<a href="AsmGen.html">AsmGen</a>]</td>
-<td><div class="info">
-Keeps position of global variables (may be obsolete soon)
-</div>
-</td></tr>
-<tr><td><a href="AsmGen.html#VALvarPositions2">varPositions2</a> [<a href="AsmGen.html">AsmGen</a>]</td>
-<td><div class="info">
-Keeps the position of local variables
-</div>
-</td></tr>
 <tr><td align="left"><br>Z</td></tr>
 <tr><td><a href="AsmSnippets.html#VALzfE1">zfE1</a> [<a href="AsmSnippets.html">AsmSnippets</a>]</td>
 <td></td></tr>
+<tr><td><a href="Helpers.html#VALzip">zip</a> [<a href="Helpers.html">Helpers</a>]</td>
+<td><div class="info">
+Helper function that zips two lists together
+</div>
+</td></tr>
 </table>
 </body>
 </html>

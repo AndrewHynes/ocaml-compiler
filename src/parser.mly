@@ -9,21 +9,31 @@
 %token <string> STRING
 %token <string> VAR
 %token <bool> BOOL
+				
 %token LET
 %token FUNC
+       
 %token LOOPWITH
 %token WHILE
-%token READ
+%token FOR
+%token BLOCK
 %token CONTINUE
 %token BREAK
-%token EQUALS
+       
+%token READ
 %token PRINT
+       
+%token EQUALS
 %token AND
 %token OR
+       
 %token ARROW
 %token EXCLAIMATION
 %token LAMBDA
 %token SEMICOLON
+%token BACKTICK
+%token APOSTROPHE
+       
 %token IF
 %token THEN
 %token ELSE
@@ -32,18 +42,19 @@
 %token LT
 %token LTEQ
 %token GTEQ
+       
 %token LBRACK
 %token RBRACK
 %token LBRACE
 %token RBRACE
+       
 %token MINUS
 %token PLUS
 %token TIMES
 %token DIV
+       
 %token MOD
 %token EOF
-%token BACKTICK
-%token APOSTROPHE
 %right SEMICOLON
 %left AND
 %left OR
@@ -96,6 +107,9 @@ expression:
   | f = funCall { f }
 
   | w = whileExp; SEMICOLON+ { w }
+  | f = forExp; SEMICOLON+ { f }
+  | b = blockExp; SEMICOLON+ { b }
+			       
   | CONTINUE; SEMICOLON+ { Continue }
   | BREAK; SEMICOLON+ { Break }
 
@@ -136,11 +150,12 @@ ifThenElse:
 loopWith:
   | LOOPWITH; e = expression { e }
 
-			     (*
-whileInternal:
-  | s = statement { s }*)
-
 whileExp:
   | WHILE; LBRACK; assign = assignmentT; RBRACK; b = expression; LBRACE; p = list(s = statement { s }); l = loopWith; RBRACE { While (assign, b, p, l) }
-					 
+												    forExp:
+  | FOR; LBRACK; assign = assignmentT; SEMICOLON+; cond = expression; SEMICOLON+; l = loopWith; RBRACK; LBRACE; p = list(s = statement { s }); RBRACE { While (assign, cond, p, l) }
+	
+blockExp:
+  | BLOCK; LBRACE; p = list(s = statement { s }); RBRACE { Block p }
+
 					 			    

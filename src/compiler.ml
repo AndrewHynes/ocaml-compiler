@@ -5,6 +5,7 @@ open Printf
 open Lexing
 open Syntax
 
+(** Takes a langType and returns a string *)
 let stringFromLangType (l : langType) = match l with
   | Int i -> string_of_int i
   | Bool b -> string_of_bool b
@@ -12,11 +13,13 @@ let stringFromLangType (l : langType) = match l with
   | String s -> s
   | Var s -> s
 
+(** Turns a list of variables into a pretty string *)
 let rec printVars = function
   | [] -> ""
   | hd::[] -> ("identifier : " ^ hd)
   | x::y::tl -> ("identifier : " ^ x ^ ", " ) ^ (printVars (y :: tl))
 
+(** Turns an expression into a pretty string *)
 let rec stringFromExpression = function
   | Value l -> stringFromLangType l
   | AssignExp (s, e) -> "(Assignment: " ^ s ^ " = " ^ (stringFromExpression e) ^ ")"
@@ -46,6 +49,7 @@ let rec stringFromExpression = function
   | LTEQ (b, c) -> "(LessThanOrEqualTo " ^ (stringFromExpression b) ^ ", " ^ (stringFromExpression c) ^ ")"
   | GTEQ (b, c) -> "(GreaterThanOrEqualTo " ^ (stringFromExpression b) ^ ", " ^ (stringFromExpression c) ^ ")"
   | While (v, b, p, l) -> "(While (" ^ (stringFromExpression v) ^ ")(" ^ (stringFromExpression b) ^ ")(" ^ (List.fold_right (fun e -> (^) @@ (("" ^ (stringFromExpression e)))) p "") ^ "(" ^ (stringFromExpression l) ^ ")"
+  | Block p -> "(Block (" ^ (List.fold_right (fun e -> (^) @@ (("" ^ (stringFromExpression e)))) p "") ^ "))"
   | Continue -> "Continue"
   | Break -> "Break"
   | _ -> ""
@@ -56,6 +60,7 @@ let rec stringFromAST = function
   | hd::tl -> (stringFromExpression hd) ^ (stringFromAST tl)
 
 (* following two functions adapted from https://realworldocaml.org/v1/en/html/parsing-with-ocamllex-and-menhir.html *)
+(** Prettily prints the position in the lexbuf we are *)
 let prettyPrintPosition outx lexbuf =
   let pos = lexbuf.lex_curr_p in
   fprintf outx "Line number: %d, Position: %d"

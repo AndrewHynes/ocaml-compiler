@@ -14,6 +14,7 @@
 <link title="AsmGen" rel="Chapter" href="AsmGen.html">
 <link title="AsmSnippets" rel="Chapter" href="AsmSnippets.html">
 <link title="Compiler" rel="Chapter" href="Compiler.html">
+<link title="Helpers" rel="Chapter" href="Helpers.html">
 <link title="MainParser" rel="Chapter" href="MainParser.html">
 <link title="Optimiser" rel="Chapter" href="Optimiser.html">
 <link title="Syntax" rel="Chapter" href="Syntax.html"><title>Optimiser</title>
@@ -68,22 +69,6 @@ True if the expression is constant, false otherwise<br>
 <br>
 </div>
 
-<pre><span id="VALexists"><span class="keyword">val</span> exists</span> : <code class="type">'a -> 'a list -> bool</code></pre><div class="info ">
-Helper function to see if something exists in a list<br>
-</div>
-
-<pre><span id="VALtail"><span class="keyword">val</span> tail</span> : <code class="type">'a list -> 'a list</code></pre><div class="info ">
-Helper function that safely gets the tail of a list<br>
-</div>
-
-<pre><span id="VALdrop"><span class="keyword">val</span> drop</span> : <code class="type">int -> 'a list -> 'a list</code></pre><div class="info ">
-Helper function that drops n elements from the front of a list<br>
-</div>
-
-<pre><span id="VALfirstN"><span class="keyword">val</span> firstN</span> : <code class="type">int -> 'a list -> 'a list</code></pre><div class="info ">
-Helper function that takes the first n elements from the front of a list<br>
-</div>
-
 <pre><span id="VALexpContainsVar"><span class="keyword">val</span> expContainsVar</span> : <code class="type">string -> <a href="Syntax.html#TYPEexpression">Syntax.expression</a> -> bool</code></pre><div class="info ">
 Checks to see if an expression contains a given variable<br>
 </div>
@@ -117,7 +102,7 @@ Fully optimises a program with every optimisation it can do. Includes:
 <li>Constant folding</li>
 </ul>
 <ul>
-<li>Constant propagation</li>
+<li>Constant propagation (including through functions)</li>
 </ul>
 <ul>
 <li>Removing unused variables</li>

@@ -186,6 +186,47 @@ let x = `printAndAdd30 20';
 x
 #+END_SRC
 
+** While Loops
+
+While loops are a little weird in CALF as CALF is a functional language, but the syntax should be somewhat intuitive. A while loop has three things, a value, a condition, and a loopWith statement. A while loop must end with a "loopWith" statement, that sets the value defined at the top of the while loop to be the value defined after loopWith.
+
+The most common use case of loopWith is x + 1, if x is your variable, but loopWith can contain any arbitrary expression to be bound to x.
+
+As with any other decent language, you can use break or continue inside these loops to either escape the loop or set the looping variable then continue back at the top.
+
+#+BEGIN_SRC language
+while (let x = 0) x < 3
+{ 
+  print x;
+  loopWith x + 1
+};
+#+END_SRC
+
+** For Loops
+
+For loops are extremely similar to while loops in that they also have those three elements, though they are always defined inside the definition of the loop, and never in the body.
+
+As with any other decent language, you can use break or continue inside these loops to either escape the loop or set the looping variable then continue back at the top.
+
+#+BEGIN_SRC language
+for (let x = 0; x < 3; loopWith x + 1) 
+{ 
+  print x;
+};
+#+END_SRC
+
+** Blocks
+
+Blocks are not dissimilar to labels in other languages in that they define a region of code. Unlike labels, you can use break; and continue; to escape them or loop as necessary. The following code will only print 100.
+
+#+BEGIN_SRC language
+block
+{ 
+  print 100;
+  break;
+  print 50;
+};
+#+END_SRC
 
 * Optimisation
 
@@ -197,7 +238,9 @@ CALF implements a varienty optimisations, including
 
 - Replaces if-then-else statements with the correct branch if the boolean is not dependent on variables
 
-- Does this recursively and fully optimises the AST (for example, it would simplify the expression (lambda _ -> lambda _ -> 6) to (lambda _ -> lambda _ -> 6)
+- Removes while loops/for loops that will never run
+
+- Does this recursively and fully optimises the AST
 
 To find more about the optimisations, see the documentation found at htmlDocs/optimiser.ml. This would, for example, optimise the following:
 

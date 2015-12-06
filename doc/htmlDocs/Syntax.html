@@ -13,6 +13,7 @@
 <link title="AsmGen" rel="Chapter" href="AsmGen.html">
 <link title="AsmSnippets" rel="Chapter" href="AsmSnippets.html">
 <link title="Compiler" rel="Chapter" href="Compiler.html">
+<link title="Helpers" rel="Chapter" href="Helpers.html">
 <link title="MainParser" rel="Chapter" href="MainParser.html">
 <link title="Optimiser" rel="Chapter" href="Optimiser.html">
 <link title="Syntax" rel="Chapter" href="Syntax.html"><title>Syntax</title>
@@ -180,6 +181,13 @@ The language's primitive data types<br>
 <td align="left" valign="top" >
 <code><span class="keyword">|</span></code></td>
 <td align="left" valign="top" >
+<code><span id="TYPEELTexpression.AssignInput"><span class="constructor">AssignInput</span></span> <span class="keyword">of</span> <code class="type">string</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
 <code><span id="TYPEELTexpression.AssignFunc"><span class="constructor">AssignFunc</span></span> <span class="keyword">of</span> <code class="type">string * string list * <a href="Syntax.html#TYPEexpression">expression</a></code></code></td>
 <td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
 The triple should contain: (name of new variable, arguments, body)<br>
@@ -218,14 +226,42 @@ The triple should contain: (name of new variable, arguments, body)<br>
 <td align="left" valign="top" >
 <code><span class="keyword">|</span></code></td>
 <td align="left" valign="top" >
-<code><span id="TYPEELTexpression.Application"><span class="constructor">Application</span></span> <span class="keyword">of</span> <code class="type"><a href="Syntax.html#TYPEexpression">expression</a> * <a href="Syntax.html#TYPEexpression">expression</a></code></code></td>
+<code><span id="TYPEELTexpression.FunCall"><span class="constructor">FunCall</span></span> <span class="keyword">of</span> <code class="type">string * <a href="Syntax.html#TYPEexpression">expression</a> list</code></code></td>
 
 </tr>
 <tr>
 <td align="left" valign="top" >
 <code><span class="keyword">|</span></code></td>
 <td align="left" valign="top" >
-<code><span id="TYPEELTexpression.FunCall"><span class="constructor">FunCall</span></span> <span class="keyword">of</span> <code class="type">string * <a href="Syntax.html#TYPEexpression">expression</a> list</code></code></td>
+<code><span id="TYPEELTexpression.While"><span class="constructor">While</span></span> <span class="keyword">of</span> <code class="type"><a href="Syntax.html#TYPEexpression">expression</a> * <a href="Syntax.html#TYPEexpression">expression</a> * <a href="Syntax.html#TYPEexpression">expression</a> list<br>        * <a href="Syntax.html#TYPEexpression">expression</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.Block"><span class="constructor">Block</span></span> <span class="keyword">of</span> <code class="type"><a href="Syntax.html#TYPEexpression">expression</a> list</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.Continue"><span class="constructor">Continue</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.Break"><span class="constructor">Break</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpression.InjectAsm"><span class="constructor">InjectAsm</span></span> <span class="keyword">of</span> <code class="type">string</code></code></td>
 
 </tr></table>
 

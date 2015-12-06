@@ -25,7 +25,7 @@ let asm_print = "
 \tpopq %rsi
 \tcallq printf\n"
 
-(* argument = location of the variable, e.g. v(%rip) or -8(%rbp) *)
+(** A function that reads a long integer from input (using scanf). Saves the input into the location of the variable given as an argument, e.g. v(%rip) or -8(%rbp) *)
 let asm_readFromInput varLocation = "
 \tleaq " ^ varLocation ^ ", %rsi
 \tleaq readFmt(%rip), %rdi
@@ -153,6 +153,7 @@ let asm_or = "
 \tpushq %rsi\n"
 
 (* Control flow... *)
+(** Makes an if statement with label name labelName *)
 let asm_ite labelName = "
 \tpopq %rsi
 \tcmpq $0, %rsi
@@ -179,7 +180,8 @@ let asm_asnVarAndMakeRoom i = "
 \tpopq %rsi
 \tsubq $16, %rsp
 \tmovq %rsi, " ^ (string_of_int i) ^ "(%rbp)\n"
-					
+
+(** Calls the function with the name fs *)
 let asm_callFunction fs = "
 \tcallq " ^ fs ^ "
 "

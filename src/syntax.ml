@@ -38,6 +38,7 @@ type expression = Plus of expression * expression
 		| FunCall of string * (expression list)
 		(* variable name, boolean condition, program, loopWith *)
 		| While of expression * expression * (expression list) * expression
+		| Block of expression list
 		| Continue
 		| Break
 		| InjectAsm of string

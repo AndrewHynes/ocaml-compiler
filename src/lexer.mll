@@ -52,6 +52,8 @@ rule read =
    | "mod" { MOD }
    | "loopWith" { LOOPWITH }
    | "while" { WHILE }
+   | "for" { FOR }
+   | "block" { BLOCK }
    | "break" { BREAK }
    | "continue" { CONTINUE }
    | "read" { READ }

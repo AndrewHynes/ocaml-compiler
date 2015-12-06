@@ -6,7 +6,6 @@ open Helpers
 
 exception CompilationError of string
 
-(* Note: will probably want to be an integer in the future. *)
 (** Keeps a list of all of the labels used (for use with branch instructions) *)
 let labels = ref []
 
@@ -41,8 +40,8 @@ let localVarLength l = List.length (List.filter (fun (_, n) -> n < 0) l)
 
 (** Adds a variable to the list of local variables *)
 let addLocalVar v = let len = (localVarLength !lVarPositions) + 1 in
-	       lVarPositions := (v, -(len * 8)) :: !lVarPositions;
-               -(len * 8)
+		    lVarPositions := (v, -(len * 8)) :: !lVarPositions;
+		    -(len * 8)
 
 (** Adds to the data segment of the output for each variable we need space for *)
 let makeDataSegment (e : expression) = match e with
@@ -50,6 +49,12 @@ let makeDataSegment (e : expression) = match e with
 			gVarPositions := (s, name) :: !gVarPositions;
 			name ^ ":\t.space 8\n"
   | _ -> ""
+
+(** Counts the amount of lets in a program, which can be useful for local scopes to 'clean up' after themselves *)
+let rec countLets = function
+  | [] -> 0
+  | (AssignExp _)::tl -> 1 + countLets tl
+  | hd::tl -> countLets tl
 	   
 (** Converts one expression to assembly *)
 let rec expToAsm (e : expression) (b : bool) = match e with
@@ -68,7 +73,7 @@ let rec expToAsm (e : expression) (b : bool) = match e with
 		     with
 		       CompilationError _ -> "\tpushq " ^ (findVar v (!gVarPositions)) ^ "(%rip)\n")
 		| _ -> raise $ CompilationError "Currently unsupported expression.\n")
- 
+		 
   | Plus (n, m) -> (expToAsm n b) ^ (expToAsm m b) ^ asm_add
   | Minus (n, m) -> (expToAsm n b) ^ (expToAsm m b) ^ asm_sub
   | Times (n, m) -> (expToAsm n b) ^ (expToAsm m b) ^ asm_mul
@@ -114,11 +119,6 @@ let rec expToAsm (e : expression) (b : bool) = match e with
   (* Assumes that the variables given in xs will be pushed to the stack *)
   | Function (s, xs, p) -> (* Ensure no conflicts in function name? *)
      let labelName = s in
-     let rec countLets = function
-			     | [] -> 0
-			     | (AssignExp _)::tl -> 1 + countLets tl
-			     | (While (_,_,_,_))::tl -> 1 + countLets tl
-			     | hd::tl -> countLets tl in
      let args = List.length xs in
      let rec addArgs n l = match n, l with
        | _, [] -> ()
@@ -147,11 +147,11 @@ let rec expToAsm (e : expression) (b : bool) = match e with
      if (not $ exists n (List.map fst !functions))
      then (raise $ CompilationError ("Function " ^ n ^ " has not been defined.\n"))
      else (
-     let args = List.length l in
-     (List.fold_right (fun e -> (^) (expToAsm e b)) l "") ^
-       (asm_callFunction n) ^
-	 ("\taddq $" ^ (string_of_int $ 8 * args) ^ ", %rsp\n") ^
-	   ("\tpushq %rax\n"))
+       let args = List.length l in
+       (List.fold_right (fun e -> (^) (expToAsm e b)) l "") ^
+	 (asm_callFunction n) ^
+	   ("\taddq $" ^ (string_of_int $ 8 * args) ^ ", %rsp\n") ^
+	     ("\tpushq %rax\n"))
 
   | PrintExp e -> (expToAsm e b) ^ asm_print
 				     
@@ -170,55 +170,75 @@ let rec expToAsm (e : expression) (b : bool) = match e with
 		       (let pos = addLocalVar s in
 			let readString = (asm_readFromInput ((string_of_int pos) ^ "(%rbp)")) in
 			(if (((localVarLength !lVarPositions) mod 2) = 1)
-					  then "\tsubq $16, %rsp" ^ readString
-					  else readString))
+			 then "\tsubq $16, %rsp" ^ readString
+			 else readString))
 			 
-  | While (a, pred, p, l) -> let (varName, varVal) = (match a with
-						   | AssignExp (v, e) -> (v, e)
-						   | _ -> raise $ CompilationError "Currently unsupported expression.\n") in
-			  let labelName = "_w" ^ (string_of_int $ List.length !labels) in
-			  labels := labelName :: !labels;
-			  let assignVar =  (expToAsm a b) in
-			  let posOfValue = (try ((findVar varName !gVarPositions) ^ "(%rip)\n")
-					    with
-					      CompilationError _ -> ((string_of_int $ findVar varName !lVarPositions) ^ "(%rbp)\n")) in
-			  (* Put our value onto the stack *)
-			  (labels := ("_ww" ^ (Str.string_after labelName 2))::(delete labelName !labels); assignVar) ^
-			    (* Start the loop... *)
-			    (labelName ^ ":\n") ^
-  (*(labelName ^ ": push " ^ labelName ^ "\n") ^*)
-			      (expToAsm (IfThenElse (pred, InjectAsm "", InjectAsm ("\tjmp " ^ labelName ^ "_e\n"))) b) ^
-				(listExpToAsm p b "") ^
-				  (* use l to impurely increment value we're using *)
-				  (expToAsm l b) ^
-				    ("\tpopq " ^ posOfValue) ^
-				      (* actually loop! *)
-				      ("\tjmp " ^ labelName ^ "\n") ^
-					(labelName ^ "_e:\n")
-  (*(labelName ^ "_e: pop " ^ labelName ^ "\n")*)
+  | While (a, pred, p, l) ->
+     let (varName, varVal) = (match a with
+			      | AssignExp (v, e) -> (v, e)
+			      | _ -> raise $ CompilationError "Currently unsupported expression.\n") in
+     let labelName = "_w" ^ (string_of_int $ List.length !labels) in
+     labels := labelName :: !labels;
+     (* Assign the variable locally (hence false) *)
+     let assignVar = (expToAsm a false) in
+     let posOfValue = ((string_of_int $ findVar varName !lVarPositions) ^ "(%rbp)\n") in
+     let oldPositions = !lVarPositions in
+     let numLets = countLets p in
+     (* Put our value onto the stack *)
+     (labels := ("_ww" ^ (Str.string_after labelName 2))::(delete labelName !labels);
+      lVarPositions := delete (varName, findVar varName !lVarPositions) !lVarPositions;
+      lVarPositions := drop numLets !lVarPositions;
+      assignVar) ^
+       (* Start the loop... *)
+       (labelName ^ ":\n") ^
+	 (*(labelName ^ ": push " ^ labelName ^ "\n") ^*)
+	 (expToAsm (IfThenElse (pred, InjectAsm "", InjectAsm ("\tjmp " ^ labelName ^ "_e\n"))) false) ^
+	   (listExpToAsm p false "") ^
+	     (* Keep a label before increment-and-loop for use by continue *)
+	     (labelName ^ "_lw:\n") ^ 
+	     (* use l to increment value we're using *)
+	     (expToAsm l false) ^
+	       ("\tpopq " ^ posOfValue) ^
+		 (* actually loop! *)
+		 ("\tjmp " ^ labelName ^ "\n") ^
+		   (labelName ^ "_e:\n") ^
+		     (if ((List.length oldPositions) mod 2) = 0
+		      then ""
+		      else "\taddq $16, %rsp\n") ^
+		       (if (numLets = 0)
+			then ""
+			else ("\taddq $" ^ (correctVarAmount numLets) ^ ", %rsp\n"))
+
+  | Block p -> let block =
+		 While
+		   (AssignExp ("_x", Value (Bool true)),
+		    Value (Bool true),
+		    (p @ [Break]),
+		    Value (Bool true)) in
+	       expToAsm block b
 
   | Break ->
      (try let lbl = List.find (fun s -> Str.string_match (Str.regexp "_w[0-9]+") s 0) !labels in
 	  (* Keep in list so we know how many labels we've had, but we've dealt with it *)
 	  ("\tjmp " ^ lbl ^ "_e\n")
       with
-	Not_found -> raise $ CompilationError "Break used whilst not in while loop.\n")
+	Not_found -> raise $ CompilationError "Break used whilst not in while/for loop or block.\n")
 
        
   | Continue ->
      (try let lbl = List.find (fun s -> Str.string_match (Str.regexp "_w[0-9]+") s 0) !labels in
-	       (* Keep in list so we know how many labels we've had, but we've dealt with it *)
-	  ("\tjmp " ^ lbl ^ "\n")
+	  (* Keep in list so we know how many labels we've had, but we've dealt with it *)
+	  ("\tjmp " ^ lbl ^ "_lw\n")
       with
-	Not_found -> raise $ CompilationError "Continue used whilst not in while loop.\n")
+	Not_found -> raise $ CompilationError "Continue used whilst not in while/for loop or block.\n")
 
   | InjectAsm s -> s
- 
+		     
   | _ -> raise $ CompilationError "Currently unsupported expression.\n"
-	      
+				  
 (** Turns a list of expressions to assembly *)
 and listExpToAsm (p : program) b acc = match p with
-  | [] -> acc
+  | [] -> acc 
   | hd::tl -> listExpToAsm tl b (acc ^ (expToAsm hd b))
 			   
 (** Gives the correct amount of space to allocate/deallocate on the stack for i variables *)
@@ -226,7 +246,7 @@ and correctVarAmount i = string_of_int $ (16 * (int_of_float (((float_of_int (i 
 
 (** Returns a string that deallocates the memory allocated to variables currently on the stack amounting to int i *)
 and deallocStackString i = "\taddq $" ^ (correctVarAmount i) ^ ", %rsp\n"
-											
+								 
 (** Converts a program p to assembly. b is whether or not this is being called in global scope *)
 (* Still accepts some nonsense programs such as 3 + 3 3 + 3 *)
 let programToAsm (p : program) =

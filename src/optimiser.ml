@@ -135,7 +135,7 @@ let rec foldConstants (exp : expression) = match exp with
   | While (v, b, p, l) ->
      let (v2, b2, p2, l2) = (foldConstants v, foldConstants b, (List.map foldConstants p), foldConstants l) in
      if (isLogicOnly b2)
-     then (if (evalLogic b)
+     then (if not $ (evalLogic b2)
 	   then (InjectAsm "")
 	   else While (v2, b2, p2, l2))
      else While (v2, b2, p2, l2)
@@ -236,8 +236,8 @@ let rec propagateExp (v : string) (ve : expression) = function
 					 | AssignExp (x2, y2) -> (x2, y2)
 					 | _ -> exit 1 (* should never happen *)) in
 			   if v = x
-			   then While (v2, propagateExp v ve b, propagateConstants p, l)
-			   else  While (propagateExp v ve v2, propagateExp x y $ propagateExp v ve b, propagateConstants p, propagateExp v ve l)
+			   then While (v2, b, propagateConstants p, l)
+			   else While (propagateExp v ve v2, propagateExp v ve b, propagateConstants p, propagateExp v ve l)
 
   | FunCall (s, es) -> FunCall (s, List.map (propagateExp v ve) es)
 
