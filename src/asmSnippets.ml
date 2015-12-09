@@ -159,11 +159,6 @@ let asm_ite labelName = "
 \tcmpq $0, %rsi
 \tjne " ^ labelName ^ "\n"
 
-(* Variable from the stack *)
-let asm_getVar i = "
-\tpopq %rsi -" ^ (string_of_int i) ^ "(%thing)
-\tpushq %rsi"
-
 (** Generates the assembly for the assignment of variables *)
 let asm_asnVar i = "
 \tpopq %rsi
@@ -172,8 +167,6 @@ let asm_asnVar i = "
 (** Generates the assembly for assignment to the positive area of stack *)
 let asm_getVarFromPos i = "
 \tmovq " ^ (string_of_int i) ^ "(%rbp), %rsi\n"
-(*let asm_getVarFromPos i = "
-\tmovq " ^ (string_of_int i) ^ "(%rbp), %rsi\n"*)
 
 (** Generates the assembly for the assignment of variables, and makes room for two variables on the stack *)
 let asm_asnVarAndMakeRoom i = "
